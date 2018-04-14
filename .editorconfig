@@ -1,0 +1,13 @@
+[*]
+trim_trailing_whitespace = true
+end_of_line = lf
+insert_final_newline = true
+charset = utf-8
+indent_size = 4
+indent_style = space
+
+[{*.json,*.yml,*.xml,*.csproj,nuget.config}]
+indent_size = 2
+
+[*.md]
+trim_trailing_whitespace = false

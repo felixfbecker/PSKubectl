@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Types>
+  <Type>
+    <Name>k8s.Models.V1Pod</Name>
+    <Members>
+      <ScriptProperty>
+        <Name>Name</Name>
+        <GetScriptBlock>$this.metadata.name</GetScriptBlock>
+      </ScriptProperty>
+      <ScriptProperty>
+        <Name>Ready</Name>
+        <GetScriptBlock>($_.status.containerStatuses | Where-Object {$_.ready} | Measure-Object).Count + "/" + $_.status.containerStatuses.Count</GetScriptBlock>
+      </ScriptProperty>
+      <ScriptProperty>
+        <Name>Ready</Name>
+        <GetScriptBlock>$_.status.phase</GetScriptBlock>
+      </ScriptProperty>
+      <ScriptProperty>
+        <Name>Status</Name>
+        <GetScriptBlock>$_.status.phase</GetScriptBlock>
+      </ScriptProperty>
+      <ScriptProperty>
+        <Name>Restarts</Name>
+        <GetScriptBlock>($_.status.containerStatuses.restartCount | Measure-Object -Sum).Sum</GetScriptBlock>
+      </ScriptProperty>
+      <ScriptProperty>
+        <Name>Age</Name>
+        <GetScriptBlock>(New-TimeSpan $_.status.startTime (Get-Date)).ToString()</GetScriptBlock>
+      </ScriptProperty>
+    </Members>
+  </Type>
+</Types>
