@@ -12,10 +12,6 @@
         <GetScriptBlock>($_.status.containerStatuses | Where-Object {$_.ready} | Measure-Object).Count + "/" + $_.status.containerStatuses.Count</GetScriptBlock>
       </ScriptProperty>
       <ScriptProperty>
-        <Name>Ready</Name>
-        <GetScriptBlock>$_.status.phase</GetScriptBlock>
-      </ScriptProperty>
-      <ScriptProperty>
         <Name>Status</Name>
         <GetScriptBlock>$_.status.phase</GetScriptBlock>
       </ScriptProperty>
