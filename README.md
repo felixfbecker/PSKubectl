@@ -6,17 +6,7 @@
 [![windows build](https://img.shields.io/appveyor/ci/felixfbecker/ps-kubectl/master.svg?label=windows+build)](https://ci.appveyor.com/project/felixfbecker/ps-kubectl)
 [![macos/linux build](https://img.shields.io/travis/felixfbecker/ps-kubectl/master.svg?label=macos/linux+build)](https://travis-ci.org/felixfbecker/ps-kubectl)
 
-`kubectl` implemented as PowerShell Cmdlets, giving you native PowerShell object output, tab completion and error handling.
-
-## Getting Started
-
-```powershell
-# Install from the PowerShell Gallery
-Install-Module kubectl
-
-# Get all pods
-Get-KubePods
-```
+`kubectl` implemented as PowerShell Cmdlets, giving you native PowerShell object output, tab completion and error handling. Work in progress 🚧
 
 ## Features
 
