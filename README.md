@@ -21,7 +21,7 @@ Get-KubePods
 ## Features
 
 *   `Get-KubePod(s)`
-*   `Get-KubeLog`
+*   `Get-KubePodLog`
 
 ## Build
 
