@@ -22,3 +22,9 @@ Get-KubePods
 
 *   `Get-KubePod(s)`
 *   `Get-KubeLog`
+
+## Build
+
+```
+dotnet build --configuration Release
+```

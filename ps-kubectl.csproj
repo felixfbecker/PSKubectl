@@ -8,7 +8,6 @@
   <ItemGroup>
     <PackageReference Include="PowerShellStandard.Library" Version="5.1.0-preview-01" />
     <PackageReference Include="KubernetesClient" Version="0.4.0-beta" />
-    <None Include="ps-kubectl.psd1" CopyToOutputDirectory="Always" />
   </ItemGroup>
 
 </Project>
