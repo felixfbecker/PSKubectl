@@ -9,28 +9,28 @@
 @{
 
     # Script module or binary module file associated with this manifest.
-    # RootModule        = 'kubectl.psm1'
+    RootModule       = 'bin/Release/netstandard2.0/ps-kubectl.dll'
 
     # Version number of this module.
-    ModuleVersion      = '0.0.1'
+    ModuleVersion    = '0.0.1'
 
     # Supported PSEditions
     # CompatiblePSEditions = @()
 
     # ID used to uniquely identify this module
-    GUID               = 'e30ad1d5-2463-486f-976e-913f84ad2aca'
+    GUID             = 'e30ad1d5-2463-486f-976e-913f84ad2aca'
 
     # Author of this module
-    Author             = 'Felix Frederick Becker'
+    Author           = 'Felix Frederick Becker'
 
     # Company or vendor of this module
     # CompanyName       = 'Unknown'
 
     # Copyright statement for this module
-    Copyright          = '(c) Felix Frederick Becker. All rights reserved.'
+    Copyright        = '(c) Felix Frederick Becker. All rights reserved.'
 
     # Description of the functionality provided by this module
-    Description        = 'kubectl for PowerShell'
+    Description      = 'kubectl for PowerShell'
 
     # Minimum version of the PowerShell engine required by this module
     # PowerShellVersion = ''
@@ -54,16 +54,16 @@
     # RequiredModules = @()
 
     # Assemblies that must be loaded prior to importing this module
-    RequiredAssemblies = @('bin/Release/netstandard2.0/ps-kubectl.dll')
+    # RequiredAssemblies = @()
 
     # Script files (.ps1) that are run in the caller's environment prior to importing this module.
     # ScriptsToProcess = @()
 
     # Type files (.ps1xml) to be loaded when importing this module
-    TypesToProcess     = @('ps-kubectl.Types.ps1xml')
+    TypesToProcess   = @('ps-kubectl.Types.ps1xml')
 
     # Format files (.ps1xml) to be loaded when importing this module
-    FormatsToProcess   = @('ps-kubectl.Format.ps1xml')
+    FormatsToProcess = @('ps-kubectl.Format.ps1xml')
 
     # Modules to import as nested modules of the module specified in RootModule/ModuleToProcess
     # NestedModules = @()
@@ -72,17 +72,17 @@
     # FunctionsToExport  = @()
 
     # Cmdlets to export from this module, for best performance, do not use wildcards and do not delete the entry, use an empty array if there are no cmdlets to export.
-    # CmdletsToExport    = @(
-    #     'Get-KubePods',
-    #     'Get-KubePod',
-    #     'Get-KubePodLog'
-    # )
+    CmdletsToExport  = @(
+        'Get-KubePods',
+        'Get-KubePod',
+        'Get-KubePodLog'
+    )
 
     # Variables to export from this module
-    VariablesToExport  = '*'
+    # VariablesToExport = @()
 
     # Aliases to export from this module, for best performance, do not use wildcards and do not delete the entry, use an empty array if there are no aliases to export.
-    AliasesToExport    = @()
+    # AliasesToExport    = @()
 
     # DSC resources to export from this module
     # DscResourcesToExport = @()
@@ -94,7 +94,7 @@
     # FileList = @()
 
     # Private data to pass to the module specified in RootModule/ModuleToProcess. This may also contain a PSData hashtable with additional module metadata used by PowerShell.
-    PrivateData        = @{
+    PrivateData      = @{
 
         PSData = @{
 
