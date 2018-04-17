@@ -8,6 +8,14 @@
 
 `kubectl` implemented as PowerShell Cmdlets, giving you native PowerShell object output, tab completion and error handling. Work in progress 🚧
 
+You currently need to run `kubectl proxy` in the background and connect to that as auth providers are not implemented yet.
+
+You can configure the default host to use for all cmdlets by adding this to your profile.ps1:
+
+```powershell
+$PSDefaultParameterValues['*-Kube*:ServerHost'] = 'http://localhost:8001'
+```
+
 ## Features
 
 *   `Get-KubePod(s)`
