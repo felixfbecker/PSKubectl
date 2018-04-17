@@ -22,7 +22,7 @@
                         <Label>Restarts</Label>
                     </TableColumnHeader>
                     <TableColumnHeader>
-                        <Label>Age</Label>
+                        <Label>StartTime</Label>
                     </TableColumnHeader>
                 </TableHeaders>
                 <TableRowEntries>
@@ -35,13 +35,13 @@
                                 <PropertyName>Ready</PropertyName>
                             </TableColumnItem>
                             <TableColumnItem>
-                                <PropertyName>Status</PropertyName>
+                                <ScriptBlock>$_.Status.Phase</ScriptBlock>
                             </TableColumnItem>
                             <TableColumnItem>
                                 <PropertyName>Restarts</PropertyName>
                             </TableColumnItem>
                             <TableColumnItem>
-                                <PropertyName>Age</PropertyName>
+                                <PropertyName>StartTime</PropertyName>
                             </TableColumnItem>
                         </TableColumnItems>
                     </TableRowEntry>

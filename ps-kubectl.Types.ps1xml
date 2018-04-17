@@ -5,23 +5,19 @@
     <Members>
       <ScriptProperty>
         <Name>Name</Name>
-        <GetScriptBlock>$this.metadata.name</GetScriptBlock>
+        <GetScriptBlock>$this.Metadata.Name</GetScriptBlock>
       </ScriptProperty>
       <ScriptProperty>
         <Name>Ready</Name>
-        <GetScriptBlock>($_.status.containerStatuses | Where-Object {$_.ready} | Measure-Object).Count + "/" + $_.status.containerStatuses.Count</GetScriptBlock>
-      </ScriptProperty>
-      <ScriptProperty>
-        <Name>Status</Name>
-        <GetScriptBlock>$_.status.phase</GetScriptBlock>
+        <GetScriptBlock>"$(($this.Status.ContainerStatuses | Where-Object {$_.Ready} | Measure-Object).Count)/$($this.Status.ContainerStatuses.Count)"</GetScriptBlock>
       </ScriptProperty>
       <ScriptProperty>
         <Name>Restarts</Name>
-        <GetScriptBlock>($_.status.containerStatuses.restartCount | Measure-Object -Sum).Sum</GetScriptBlock>
+        <GetScriptBlock>($this.Status.ContainerStatuses.RestartCount | Measure-Object -Sum).Sum</GetScriptBlock>
       </ScriptProperty>
       <ScriptProperty>
-        <Name>Age</Name>
-        <GetScriptBlock>(New-TimeSpan $_.status.startTime (Get-Date)).ToString()</GetScriptBlock>
+        <Name>StartTime</Name>
+        <GetScriptBlock>$this.Status.StartTime</GetScriptBlock>
       </ScriptProperty>
     </Members>
   </Type>
