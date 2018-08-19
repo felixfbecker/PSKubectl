@@ -2,6 +2,7 @@
 
 [![powershellgallery](https://img.shields.io/powershellgallery/v/Kubectl.svg)](https://www.powershellgallery.com/packages/Kubectl)
 [![downloads](https://img.shields.io/powershellgallery/dt/Kubectl.svg?label=downloads)](https://www.powershellgallery.com/packages/Kubectl)
+[![builds](https://img.shields.io/vso/build/felixfbecker/ac9f86f8-64e9-4d02-934f-f0725c27e283/3.svg)](https://felixfbecker.visualstudio.com/PSKubectl/_build/latest?definitionId=3&branch=master)
 ![powershell: >=6.1.0-preview.3](https://img.shields.io/badge/powershell-%3E%3D6.1.0--preview.3-orange.svg)
 [![codecov](https://codecov.io/gh/felixfbecker/PSKubectl/branch/master/graph/badge.svg)](https://codecov.io/gh/felixfbecker/PSKubectl)
 
