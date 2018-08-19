@@ -13,7 +13,7 @@ using System.Threading.Tasks;
 namespace Kubectl {
     [Cmdlet(VerbsCommon.Get, "KubeLog")]
     [OutputType(new[] { typeof(string) })]
-    public class GetKubePodLogCmdlet : KubeCmdlet {
+    public class GetKubeLogCmdlet : KubeCmdlet {
         [Parameter()]
         public string Namespace { get; set; }
 
