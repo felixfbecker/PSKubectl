@@ -7,7 +7,6 @@ using System.Threading.Tasks;
 using KubeClient;
 using KubeClient.Extensions.KubeConfig;
 using Microsoft.Extensions.Logging;
-using Serilog.Extensions.Logging;
 
 namespace Kubectl {
     public abstract class KubeCmdlet : AsyncCmdlet, IDisposable {
@@ -34,17 +33,10 @@ namespace Kubectl {
             if (ApiEndPoint != null) {
                 clientOptions.ApiEndPoint = ApiEndPoint;
             }
-            LoggerFactory loggerFactory = null;
-#if DEBUG
-            loggerFactory = new LoggerFactory();
-            String logFile = Path.GetFullPath(Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "..", "logs", "PSKubectl-{Date}.log"));
-            WriteVerbose($"Debug build, logging to {logFile}");
-            loggerFactory.AddFile(logFile, LogLevel.Trace);
-            // this.loggerProvider = new CmdletLoggerProvider(this);
-            // loggerFactory.AddProvider(loggerProvider);
-            clientOptions.LogHeaders = true;
-            clientOptions.LogPayloads = true;
-#endif
+            // clientOptions.LogHeaders = true;
+            // clientOptions.LogPayloads = true;
+            LoggerFactory loggerFactory = new LoggerFactory();
+            loggerFactory.AddProvider(new CmdletLoggerProvider(this));
             client = KubeApiClient.Create(clientOptions, loggerFactory);
         }
 

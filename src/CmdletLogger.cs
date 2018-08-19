@@ -9,11 +9,9 @@ using Microsoft.Extensions.Logging;
 namespace Kubectl {
     public class CmdletLogger : ILogger {
         private readonly Cmdlet cmdlet;
-        private readonly ConcurrentQueue<Action> queue;
 
-        public CmdletLogger(Cmdlet cmdlet, ConcurrentQueue<Action> queue) {
+        public CmdletLogger(Cmdlet cmdlet) {
             this.cmdlet = cmdlet;
-            this.queue = queue;
         }
 
         public IDisposable BeginScope<TState>(TState state) {
@@ -25,20 +23,23 @@ namespace Kubectl {
             return true;
         }
 
-        public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception exception, Func<TState, Exception, string> formatter) {
-            this.queue.Enqueue(() => {
+        public void Log<TState>(LogLevel logLevel, EventId eventId, TState logState, Exception exception, Func<TState, Exception, string> formatter) {
+            if (!(SynchronizationContext.Current is ThreadAffinitiveSynchronizationContext)) {
+                return;
+            }
+            SynchronizationContext.Current.Post(state => {
                 switch (logLevel) {
-                    case LogLevel.Debug:
-                        this.cmdlet.WriteDebug(formatter(state, exception));
-                        break;
                     case LogLevel.Trace:
-                        this.cmdlet.WriteVerbose(formatter(state, exception));
+                        this.cmdlet.WriteDebug(formatter(logState, exception));
+                        break;
+                    case LogLevel.Debug:
+                        this.cmdlet.WriteVerbose(formatter(logState, exception));
                         break;
                     case LogLevel.Information:
-                        this.cmdlet.WriteInformation(formatter(state, exception), new string[] { eventId.Name });
+                        this.cmdlet.WriteInformation(formatter(logState, exception), new string[] { eventId.Name });
                         break;
                     case LogLevel.Warning:
-                        this.cmdlet.WriteWarning(formatter(state, exception));
+                        this.cmdlet.WriteWarning(formatter(logState, exception));
                         break;
                     case LogLevel.Error:
                         this.cmdlet.WriteError(new ErrorRecord(exception, exception.GetType().FullName, ErrorCategory.NotSpecified, null));
@@ -47,7 +48,7 @@ namespace Kubectl {
                         this.cmdlet.ThrowTerminatingError(new ErrorRecord(exception, exception.GetType().FullName, ErrorCategory.NotSpecified, null));
                         break;
                 }
-            });
+            }, null);
         }
     }
 }
