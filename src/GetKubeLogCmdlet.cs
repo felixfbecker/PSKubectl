@@ -17,7 +17,7 @@ namespace Kubectl {
         [Parameter()]
         public string Namespace { get; set; }
 
-        [Parameter(Position = 0, Mandatory = true)]
+        [Parameter(Position = 0, Mandatory = true, ValueFromPipeline = true, ValueFromPipelineByPropertyName = true)]
         public string Name { get; set; }
 
         [Parameter(Position = 1)]
