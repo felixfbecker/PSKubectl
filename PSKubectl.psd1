@@ -60,10 +60,17 @@
     # ScriptsToProcess = @()
 
     # Type files (.ps1xml) to be loaded when importing this module
-    TypesToProcess   = @('src/Types/PodV1.Types.ps1xml')
+    TypesToProcess   = @(
+        'src/Types/Config.Types.ps1xml',
+        'src/Types/Context.Types.ps1xml',
+        'src/Types/PodV1.Types.ps1xml'
+    )
 
     # Format files (.ps1xml) to be loaded when importing this module
-    FormatsToProcess = @('src/Formats/PodV1.Format.ps1xml')
+    FormatsToProcess = @(
+        'src/Formats/Config.Format.ps1xml',
+        'src/Formats/PodV1.Format.ps1xml'
+    )
 
     # Modules to import as nested modules of the module specified in RootModule/ModuleToProcess
     # NestedModules = @()
@@ -73,8 +80,11 @@
 
     # Cmdlets to export from this module, for best performance, do not use wildcards and do not delete the entry, use an empty array if there are no cmdlets to export.
     CmdletsToExport  = @(
-        'Get-KubePod',
-        'Get-KubeLog'
+        'Get-KubeConfig',
+        'Set-KubeConfig',
+        'Use-KubeContext',
+        'Get-KubeLog',
+        'Get-KubePod'
     )
 
     # Variables to export from this module

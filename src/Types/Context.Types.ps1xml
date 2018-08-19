@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Types>
+    <Type>
+        <Name>KubeClient.Extensions.KubeConfig.Models.Context</Name>
+        <Members>
+            <ScriptProperty>
+                <Name>ClusterName</Name>
+                <GetScriptBlock>$this.Config.ClusterName</GetScriptBlock>
+            </ScriptProperty>
+            <ScriptProperty>
+                <Name>UserName</Name>
+                <GetScriptBlock>$this.Config.UserName</GetScriptBlock>
+            </ScriptProperty>
+            <MemberSet>
+                <Name>PSStandardMembers</Name>
+                <Members>
+                    <PropertySet>
+                        <Name>DefaultDisplayPropertySet</Name>
+                        <ReferencedProperties>
+                            <Name>Name</Name>
+                            <Name>ClusterName</Name>
+                            <Name>UserName</Name>
+                        </ReferencedProperties>
+                    </PropertySet>
+                </Members>
+            </MemberSet>
+        </Members>
+    </Type>
+</Types>
