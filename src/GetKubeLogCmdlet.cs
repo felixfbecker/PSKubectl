@@ -35,9 +35,10 @@ namespace Kubectl {
                 IObservable<string> logs = client.PodsV1().StreamLogs(
                     kubeNamespace: Namespace,
                     name: Name,
-                    containerName: Container
+                    containerName: Container,
+                    limitBytes: LimitBytes
                 );
-                await logs.ForEachAsync(WriteObject, cancellationToken);
+                await logs.ObserveOn(SynchronizationContext.Current).ForEachAsync(WriteObject, cancellationToken);
             } else {
                 string logs = await client.PodsV1().Logs(
                     kubeNamespace: Namespace,
