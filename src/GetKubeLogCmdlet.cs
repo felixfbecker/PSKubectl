@@ -26,6 +26,9 @@ namespace Kubectl {
         [Parameter()]
         public SwitchParameter Follow { get; set; }
 
+        [Parameter()]
+        public int? LimitBytes { get; set; }
+
         protected override async Task ProcessRecordAsync(CancellationToken cancellationToken) {
             base.BeginProcessing();
             if (Follow) {
@@ -40,6 +43,7 @@ namespace Kubectl {
                     kubeNamespace: Namespace,
                     name: Name,
                     containerName: Container,
+                    limitBytes: LimitBytes,
                     cancellationToken: cancellationToken
                 );
                 WriteObject(logs);
