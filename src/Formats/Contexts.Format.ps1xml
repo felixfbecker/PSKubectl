@@ -1,53 +1,9 @@
 <?xml version="1.0" encoding="utf-8" ?>
+
+<!-- OUTDATED -->
+
 <Configuration>
     <ViewDefinitions>
-        <View>
-            <!-- Resembles the default output of kubectl get pod -->
-            <Name>k8s.Models.V1Pod</Name>
-            <ViewSelectedBy>
-                <TypeName>k8s.Models.V1Pod</TypeName>
-            </ViewSelectedBy>
-            <TableControl>
-                <TableHeaders>
-                    <TableColumnHeader>
-                        <Label>Name</Label>
-                    </TableColumnHeader>
-                    <TableColumnHeader>
-                        <Label>Ready</Label>
-                    </TableColumnHeader>
-                    <TableColumnHeader>
-                        <Label>Status</Label>
-                    </TableColumnHeader>
-                    <TableColumnHeader>
-                        <Label>Restarts</Label>
-                    </TableColumnHeader>
-                    <TableColumnHeader>
-                        <Label>StartTime</Label>
-                    </TableColumnHeader>
-                </TableHeaders>
-                <TableRowEntries>
-                    <TableRowEntry>
-                        <TableColumnItems>
-                            <TableColumnItem>
-                                <PropertyName>Name</PropertyName>
-                            </TableColumnItem>
-                            <TableColumnItem>
-                                <PropertyName>Ready</PropertyName>
-                            </TableColumnItem>
-                            <TableColumnItem>
-                                <ScriptBlock>$_.Status.Phase</ScriptBlock>
-                            </TableColumnItem>
-                            <TableColumnItem>
-                                <PropertyName>Restarts</PropertyName>
-                            </TableColumnItem>
-                            <TableColumnItem>
-                                <PropertyName>StartTime</PropertyName>
-                            </TableColumnItem>
-                        </TableColumnItems>
-                    </TableRowEntry>
-                </TableRowEntries>
-            </TableControl>
-        </View>
         <View>
             <!-- Resembles the default output of kubectl config get-contexts -->
             <Name>Kube.Context</Name>

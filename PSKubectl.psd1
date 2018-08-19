@@ -9,13 +9,13 @@
 @{
 
     # Script module or binary module file associated with this manifest.
-    RootModule       = 'bin/Release/netstandard2.0/ps-kubectl.dll'
+    RootModule       = 'out/PSKubectl.dll'
 
     # Version number of this module.
     ModuleVersion    = '0.0.1'
 
     # Supported PSEditions
-    # CompatiblePSEditions = @()
+    # CompatiblePSEditions = @('Core')
 
     # ID used to uniquely identify this module
     GUID             = 'e30ad1d5-2463-486f-976e-913f84ad2aca'
@@ -30,10 +30,10 @@
     Copyright        = '(c) Felix Frederick Becker. All rights reserved.'
 
     # Description of the functionality provided by this module
-    Description      = 'kubectl for PowerShell'
+    Description      = 'kubectl with the power of the object pipeline'
 
     # Minimum version of the PowerShell engine required by this module
-    # PowerShellVersion = ''
+    # PowerShellVersion = '6.1.0-preview.3'
 
     # Name of the PowerShell host required by this module
     # PowerShellHostName = ''
@@ -60,10 +60,10 @@
     # ScriptsToProcess = @()
 
     # Type files (.ps1xml) to be loaded when importing this module
-    TypesToProcess   = @('ps-kubectl.Types.ps1xml')
+    TypesToProcess   = @('src/Types/PodV1.Types.ps1xml')
 
     # Format files (.ps1xml) to be loaded when importing this module
-    FormatsToProcess = @('ps-kubectl.Format.ps1xml')
+    FormatsToProcess = @('src/Formats/PodV1.Format.ps1xml')
 
     # Modules to import as nested modules of the module specified in RootModule/ModuleToProcess
     # NestedModules = @()
@@ -73,9 +73,8 @@
 
     # Cmdlets to export from this module, for best performance, do not use wildcards and do not delete the entry, use an empty array if there are no cmdlets to export.
     CmdletsToExport  = @(
-        'Get-KubePods',
         'Get-KubePod',
-        'Get-KubePodLog'
+        'Get-KubeLog'
     )
 
     # Variables to export from this module
@@ -108,7 +107,7 @@
             ProjectUri = 'https://github.com/felixfbecker/ps-kubectl'
 
             # A URL to an icon representing this module.
-            IconUri    = 'https://raw.githubusercontent.com/kubernetes/kubernetes/f5f6f3e715cb8dfbd9657a4229c77ec6a5eab135/logo/logo.svg'
+            IconUri    = 'https://github.com/kubernetes/kubernetes/raw/31420467ae9503850515786660fa3e93e9d140b2/logo/logo.png'
 
             # ReleaseNotes of this module
             # ReleaseNotes = ''

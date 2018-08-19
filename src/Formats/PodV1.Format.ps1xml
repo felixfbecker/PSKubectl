@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Configuration>
+    <ViewDefinitions>
+        <View>
+            <!-- Resembles the default output of kubectl get pod -->
+            <Name>Default</Name>
+            <ViewSelectedBy>
+                <TypeName>KubeClient.Models.PodV1</TypeName>
+            </ViewSelectedBy>
+            <TableControl>
+                <TableHeaders>
+                    <TableColumnHeader>
+                        <Label>Name</Label>
+                    </TableColumnHeader>
+                    <TableColumnHeader>
+                        <Label>Ready</Label>
+                    </TableColumnHeader>
+                    <TableColumnHeader>
+                        <Label>Status</Label>
+                    </TableColumnHeader>
+                    <TableColumnHeader>
+                        <Label>Restarts</Label>
+                    </TableColumnHeader>
+                    <TableColumnHeader>
+                        <Label>StartTime</Label>
+                    </TableColumnHeader>
+                </TableHeaders>
+                <TableRowEntries>
+                    <TableRowEntry>
+                        <TableColumnItems>
+                            <TableColumnItem>
+                                <PropertyName>Name</PropertyName>
+                            </TableColumnItem>
+                            <TableColumnItem>
+                                <ScriptBlock>"$(($_.Status.ContainerStatuses | Where-Object {$_.Ready} | Measure-Object).Count)/$($this.Status.ContainerStatuses.Count)"</ScriptBlock>
+                            </TableColumnItem>
+                            <TableColumnItem>
+                                <ScriptBlock>$_.Status.Phase</ScriptBlock>
+                            </TableColumnItem>
+                            <TableColumnItem>
+                                <PropertyName>Restarts</PropertyName>
+                            </TableColumnItem>
+                            <TableColumnItem>
+                                <PropertyName>StartTime</PropertyName>
+                            </TableColumnItem>
+                        </TableColumnItems>
+                    </TableRowEntry>
+                </TableRowEntries>
+            </TableControl>
+        </View>
+    </ViewDefinitions>
+</Configuration>
