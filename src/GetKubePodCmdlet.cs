@@ -44,7 +44,7 @@ namespace Kubectl {
                 var pattern = new WildcardPattern(Name);
                 podList = podList.Where(pod => pattern.IsMatch(pod.Metadata.Name));
             }
-            WriteObject(podList);
+            WriteObject(podList, true);
         }
     }
 }

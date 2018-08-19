@@ -34,7 +34,8 @@ The `Name` parameter supports wildcard patterns, which can be very convenient to
 
 ### `Get-KubeLog`
 
-Equivalent to `kubectl logs`. Pass `-Follow` to stream logs.
+Equivalent to `kubectl logs`. Pass `-Follow` to stream logs.  
+The cmdlet accepts pipeline input from `Get-KubePod`.
 
 ### `Get-KubeConfig`
 
