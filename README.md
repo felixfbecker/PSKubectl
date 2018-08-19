@@ -30,6 +30,7 @@ $PSDefaultParameterValues['*-Kube*:ApiEndPoint'] = 'http://127.0.0.1:8001'
 
 Equivalent to `kubectl get pods` and `kubectl describe pod`.
 The default output formatting mirrors the tabular output of `kubectl get pods`, but you can get all Pod properties from the returned objects.
+The `Name` parameter supports wildcard patterns, which can be very convenient to get all pods for a deployment (e.g. `Get-KubePod my-deployment-*`).
 
 ### `Get-KubeLog`
 
