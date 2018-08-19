@@ -1,0 +1,15 @@
+name: $(BuildID)
+
+phases:
+  - template: .vsts/template.yml
+    parameters:
+      name: Linux
+      queue: 'Hosted Linux Preview'
+  - template: .vsts/template.yml
+    parameters:
+      name: macOS
+      queue: 'Hosted macOS Preview'
+  - template: .vsts/template.yml
+    parameters:
+      name: Windows
+      queue: 'Hosted VS2017'

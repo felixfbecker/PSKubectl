@@ -1,0 +1,10 @@
+parameters:
+  name: ''
+  queue: ''
+
+phases:
+  - phase: ${{ parameters.name }}
+    queue: ${{ parameters.queue }}
+    steps:
+      - powershell: ./build.ps1
+        displayName: Build assemblies
