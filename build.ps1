@@ -1,9 +1,15 @@
 param(
     [ValidateSet('Debug', 'Release')]
-    [string] $Configuration = 'Debug'
+    [string] $Configuration = 'Debug',
+
+    [switch] $NoRestore
 )
 
-dotnet publish -o out -c $Configuration --no-restore
+$options = @()
+if ($NoRestore) {
+    $options += '--no-restore'
+}
+dotnet publish -o out -c $Configuration @options
 if ($LASTEXITCODE -ne 0) {
     throw "Build failed"
 }
