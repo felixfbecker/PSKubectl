@@ -3,13 +3,14 @@ using System.IO;
 using System.Management.Automation;
 using System.Reflection;
 using System.Threading;
+using System.Threading.Tasks;
 using KubeClient;
 using KubeClient.Extensions.KubeConfig;
 using Microsoft.Extensions.Logging;
 using Serilog.Extensions.Logging;
 
 namespace Kubectl {
-    public abstract class KubeCmdlet : PSCmdlet, IDisposable {
+    public abstract class KubeCmdlet : AsyncCmdlet, IDisposable {
         /// <summary>The Kubernetes API endpoint to connect to</summary>
         [Parameter()]
         public Uri ApiEndPoint { get; set; }
@@ -21,14 +22,10 @@ namespace Kubectl {
         /// <summary>The API client to be used by child cmdlets</summary>
         protected KubeApiClient client;
 
-        private CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
-        /// <summary>A CancellationToken that gets cancelled when `StopProcessing()` is called. Can be passed to API requests.</summary>
-        protected CancellationToken CancellationToken { get { return cancellationTokenSource.Token; } }
-
         protected ILogger Logger;
 
-        protected override void BeginProcessing() {
-            base.BeginProcessing();
+        protected override async Task BeginProcessingAsync(CancellationToken cancellationToken) {
+            await base.BeginProcessingAsync(cancellationToken);
             K8sConfig config = K8sConfig.Load();
             KubeClientOptions clientOptions = config.ToKubeClientOptions(
                 defaultKubeNamespace: "default"
@@ -51,17 +48,12 @@ namespace Kubectl {
             client = KubeApiClient.Create(clientOptions, loggerFactory);
         }
 
-        protected override void EndProcessing() {
-            base.EndProcessing();
-        }
-
-        protected sealed override void StopProcessing() {
-            this.cancellationTokenSource.Cancel();
-        }
-
-        public virtual void Dispose() {
-            this.client.Dispose();
-            this.cancellationTokenSource.Dispose();
+        protected override void Dispose(bool disposing) {
+            base.Dispose(disposing);
+            if (this.client != null) {
+                this.client.Dispose();
+                this.client = null;
+            }
         }
     }
 }

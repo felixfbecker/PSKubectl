@@ -7,6 +7,8 @@ using KubeClient;
 using KubeClient.Models;
 using KubeClient.ResourceClients;
 using Microsoft.Extensions.Logging;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Kubectl {
     [Cmdlet(VerbsCommon.Get, "KubeLog")]
@@ -24,7 +26,7 @@ namespace Kubectl {
         [Parameter()]
         public SwitchParameter Follow { get; set; }
 
-        protected override void ProcessRecord() {
+        protected override async Task ProcessRecordAsync(CancellationToken cancellationToken) {
             base.BeginProcessing();
             if (Follow) {
                 IObservable<string> logs = client.PodsV1().StreamLogs(
@@ -32,21 +34,15 @@ namespace Kubectl {
                     name: Name,
                     containerName: Container
                 );
-                // TODO this makes it impossible to Ctrl+C until another log comes in
-                foreach (String chunk in logs.ToEnumerable()) {
-                    WriteObject(chunk);
-                    if (CancellationToken.IsCancellationRequested) {
-                        return;
-                    }
-                }
+                await logs.ForEachAsync(WriteObject, cancellationToken);
             } else {
-                string logs = client.PodsV1().Logs(
+                string logs = await client.PodsV1().Logs(
                     kubeNamespace: Namespace,
                     name: Name,
                     containerName: Container,
-                    cancellationToken: CancellationToken
-                ).GetAwaiter().GetResult();
-                this.WriteObject(logs);
+                    cancellationToken: cancellationToken
+                );
+                WriteObject(logs);
             }
         }
     }
