@@ -21,8 +21,6 @@ namespace Kubectl {
         /// <summary>The API client to be used by child cmdlets</summary>
         protected KubeApiClient client;
 
-        protected ILogger Logger;
-
         protected override async Task BeginProcessingAsync(CancellationToken cancellationToken) {
             await base.BeginProcessingAsync(cancellationToken);
             K8sConfig config = K8sConfig.Load();
