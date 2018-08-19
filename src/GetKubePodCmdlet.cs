@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Management.Automation;
+using System.Threading;
+using System.Threading.Tasks;
 using KubeClient;
 using KubeClient.Models;
 using KubeClient.ResourceClients;
@@ -11,7 +13,7 @@ namespace Kubectl {
     [OutputType(new[] { typeof(PodV1) })]
     public sealed class GetKubePodCmdlet : KubeCmdlet {
         [Parameter()]
-        public string Namespace { get; set; } = "default";
+        public string Namespace { get; set; }
 
         [Parameter()]
         public string LabelSelector { get; set; }
@@ -19,21 +21,21 @@ namespace Kubectl {
         [Parameter(Position = 0, ValueFromPipeline = true, ValueFromPipelineByPropertyName = true)]
         public string Name { get; set; }
 
-        protected override void ProcessRecord() {
-            base.ProcessRecord();
+        protected override async Task ProcessRecordAsync(CancellationToken cancellationToken) {
+            await base.ProcessRecordAsync(cancellationToken);
             if (String.IsNullOrEmpty(Name)) {
-                PodListV1 podList = client.PodsV1().List(
+                PodListV1 podList = await client.PodsV1().List(
                     kubeNamespace: Namespace,
                     labelSelector: LabelSelector,
-                    cancellationToken: CancellationToken
-                ).GetAwaiter().GetResult();
+                    cancellationToken: cancellationToken
+                );
                 WriteObject(podList);
             } else {
-                PodV1 pod = client.PodsV1().Get(
+                PodV1 pod = await client.PodsV1().Get(
                     name: Name,
                     kubeNamespace: Namespace,
-                    cancellationToken: CancellationToken
-                ).GetAwaiter().GetResult();
+                    cancellationToken: cancellationToken
+                );
                 WriteObject(pod);
             }
         }
