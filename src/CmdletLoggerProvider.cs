@@ -13,7 +13,7 @@ namespace Kubectl {
         }
 
         public ILogger CreateLogger(string categoryName) {
-            return new CmdletLogger(cmdlet);
+            return new CmdletLogger(cmdlet, categoryName);
         }
 
         public void Dispose() { }

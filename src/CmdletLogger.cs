@@ -9,9 +9,11 @@ using Microsoft.Extensions.Logging;
 namespace Kubectl {
     public class CmdletLogger : ILogger {
         private readonly Cmdlet cmdlet;
+        private string categoryName;
 
-        public CmdletLogger(Cmdlet cmdlet) {
+        public CmdletLogger(Cmdlet cmdlet, string categoryName) {
             this.cmdlet = cmdlet;
+            this.categoryName = categoryName;
         }
 
         public IDisposable BeginScope<TState>(TState state) {
@@ -30,16 +32,16 @@ namespace Kubectl {
             SynchronizationContext.Current.Post(state => {
                 switch (logLevel) {
                     case LogLevel.Trace:
-                        this.cmdlet.WriteDebug(formatter(logState, exception));
+                        this.cmdlet.WriteDebug(categoryName + ": " + formatter(logState, exception));
                         break;
                     case LogLevel.Debug:
-                        this.cmdlet.WriteVerbose(formatter(logState, exception));
+                        this.cmdlet.WriteVerbose(categoryName + ": " + formatter(logState, exception));
                         break;
                     case LogLevel.Information:
-                        this.cmdlet.WriteInformation(formatter(logState, exception), new string[] { eventId.Name });
+                        this.cmdlet.WriteInformation(categoryName + ": " + formatter(logState, exception), new string[] { eventId.Name });
                         break;
                     case LogLevel.Warning:
-                        this.cmdlet.WriteWarning(formatter(logState, exception));
+                        this.cmdlet.WriteWarning(categoryName + ": " + formatter(logState, exception));
                         break;
                     case LogLevel.Error:
                         this.cmdlet.WriteError(new ErrorRecord(exception, exception.GetType().FullName, ErrorCategory.NotSpecified, null));

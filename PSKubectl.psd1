@@ -69,6 +69,7 @@
     # Format files (.ps1xml) to be loaded when importing this module
     FormatsToProcess = @(
         'src/Formats/Config.Format.ps1xml',
+        'src/Formats/JsonPatch.Operations.Operation.Format.ps1xml',
         'src/Formats/PodV1.Format.ps1xml'
     )
 
@@ -80,11 +81,15 @@
 
     # Cmdlets to export from this module, for best performance, do not use wildcards and do not delete the entry, use an empty array if there are no cmdlets to export.
     CmdletsToExport  = @(
+        'Compare-KubeResource',
+        'ConvertFrom-KubeYaml',
         'Get-KubeConfig',
-        'Set-KubeConfig',
-        'Use-KubeContext',
         'Get-KubeLog',
-        'Get-KubePod'
+        'Get-KubePod',
+        'Get-KubeDeployment',
+        'Set-KubeConfig',
+        'Update-KubeResource',
+        'Use-KubeContext'
     )
 
     # Variables to export from this module

@@ -26,18 +26,22 @@ $PSDefaultParameterValues['*-Kube*:ApiEndPoint'] = 'http://127.0.0.1:8001'
 
 ## Features
 
-### `Get-KubePod`
+### App Management
+
+#### `Get-KubePod`
 
 Equivalent to `kubectl get pods` and `kubectl describe pod`.
 The default output formatting mirrors the tabular output of `kubectl get pods`, but you can get all Pod properties from the returned objects.
 The `Name` parameter supports wildcard patterns, which can be very convenient to get all pods for a deployment (e.g. `Get-KubePod my-deployment-*`).
 
-### `Get-KubeLog`
+#### `Get-KubeLog`
 
 Equivalent to `kubectl logs`. Pass `-Follow` to stream logs.  
 The cmdlet accepts pipeline input from `Get-KubePod`.
 
-### `Get-KubeConfig`
+### Configuration
+
+#### `Get-KubeConfig`
 
 Gets the Kubernetes configuration parsed from `~/.kube/config`.
 
@@ -45,11 +49,11 @@ To get the clusters like `kubectl config get-clusters`, run `(Get-KubeConfig).Cl
 To get all contexts like `kubectl config get-contexts`, run `(Get-KubeConfig).Contexts`.  
 To get the current context like `kubectl config current-context`, run `(Get-KubeConfig).CurrentContext`
 
-### `Set-KubeConfig`
+#### `Set-KubeConfig`
 
 A convenience cmdlet to update kubeconfig. Does nothing but serialize a given config object back to YAML and save it back to `~/.kube/config`.
 
-### `Use-KubeContext`
+#### `Use-KubeContext`
 
 A convenience cmdlet to update the current context. Supports tab-completion for the context name. Equivalent of `kubectl config use-context`.
 

@@ -6,46 +6,27 @@ using System.Threading;
 using System.Threading.Tasks;
 using KubeClient;
 using KubeClient.Extensions.KubeConfig;
+using KubeClient.Models;
+using KubeClient.ResourceClients;
 using Microsoft.Extensions.Logging;
 
 namespace Kubectl {
-    public abstract class KubeCmdlet : AsyncCmdlet, IDisposable {
-        /// <summary>The Kubernetes API endpoint to connect to</summary>
-        [Parameter()]
-        public Uri ApiEndPoint { get; set; }
-
-        /// <summary>Skip verification of the server's SSL certificate?</summary>
-        [Parameter()]
-        public SwitchParameter AllowInsecure { get; set; }
-
-        protected K8sConfig config;
-
-        /// <summary>The API client to be used by child cmdlets</summary>
-        protected KubeApiClient client;
+    public abstract class KubeCmdlet : AsyncCmdlet {
+        protected ILogger Logger;
+        protected ILoggerFactory LoggerFactory;
 
         protected override async Task BeginProcessingAsync(CancellationToken cancellationToken) {
-            await base.BeginProcessingAsync(cancellationToken);
-            config = K8sConfig.Load();
-            KubeClientOptions clientOptions = config.ToKubeClientOptions(
-                defaultKubeNamespace: "default"
-            );
-            clientOptions.AllowInsecure = AllowInsecure;
-            if (ApiEndPoint != null) {
-                clientOptions.ApiEndPoint = ApiEndPoint;
-            }
-            // clientOptions.LogHeaders = true;
-            // clientOptions.LogPayloads = true;
-            LoggerFactory loggerFactory = new LoggerFactory();
-            loggerFactory.AddProvider(new CmdletLoggerProvider(this));
-            client = KubeApiClient.Create(clientOptions, loggerFactory);
+            await base.BeginProcessingAsync(cancellationToken); ;
+            LoggerFactory = new LoggerFactory();
+            LoggerFactory.AddProvider(new CmdletLoggerProvider(this));
+            var logFile = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "..", "logs", "PSKubectl-{Date}.log");
+            WriteVerbose($"Logging to {logFile}");
+            LoggerFactory.AddFile(logFile, LogLevel.Trace);
+            Logger = LoggerFactory.CreateLogger("KubeCmdlet");
         }
 
         protected override void Dispose(bool disposing) {
             base.Dispose(disposing);
-            if (this.client != null) {
-                this.client.Dispose();
-                this.client = null;
-            }
         }
     }
 }

@@ -6,9 +6,11 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="KubeClient" Version="2.1.6" />
-        <PackageReference Include="KubeClient.Extensions.KubeConfig" Version="2.1.6" />
+        <PackageReference Include="KubeClient" Version="2.2.0-dynamic-client0034" />
+        <PackageReference Include="KubeClient.Extensions.KubeConfig" Version="2.2.0-dynamic-client0034" />
+        <PackageReference Include="Microsoft.AspNetCore.JsonPatch" Version="2.1.1" />
         <PackageReference Include="Microsoft.PowerShell.SDK" Version="6.0.4" />
+        <PackageReference Include="Serilog.Extensions.Logging.File" Version="1.1.0" />
     </ItemGroup>
 
 </Project>
