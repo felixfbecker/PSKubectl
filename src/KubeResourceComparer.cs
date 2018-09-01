@@ -114,13 +114,14 @@ namespace Kubectl {
                 return;
             }
 
-            if (original.GetType() != modified.GetType()) {
-                // Type changed, replace
+            // From this point, original and modified are known to be non-null
+            if (original.GetType() != modified.GetType() && !(modified is KubeClient.Models.Tracked.ITracked && original.GetType().IsAssignableFrom(modified.GetType()))) {
+                // Types are not mergable, replace
                 patch.Replace(path, modified);
                 return;
             }
 
-            // FROM THIS POINT, `original` AND `modified` ARE KNOWN TO BE THE SAME TYPE AND NON-NULL
+            // From this point, `original` and `modified` are known to be the same type (besides tacked/non-tracked) and non-null
 
             var type = modified.GetType();
             logger.LogTrace($"Type: {original.GetType().FullName} {type.FullName}");
@@ -137,6 +138,8 @@ namespace Kubectl {
                 }
                 return;
             }
+
+            // From this point, original and modified are known to be reference types
 
             if (System.Object.ReferenceEquals(original, modified)) {
                 // Same object, short cut
@@ -332,27 +335,31 @@ namespace Kubectl {
                 }
             } else {
                 logger.LogTrace("Is other object");
-                if (original is KubeResourceV1) {
-                    // resourceVersion: a string that identifies the internal version of this object that can be
-                    // used by clients to determine when objects have changed. This value MUST be treated as opaque
-                    // by clients and passed unmodified back to the server.
+                if (original is KubeResourceV1 && !String.IsNullOrEmpty(((KubeResourceV1)original).Metadata.ResourceVersion)) {
+                    // resourceVersion: a string that identifies the internal version of this object that can be used by
+                    // clients to determine when objects have changed. This value MUST be treated as opaque by clients
+                    // and passed unmodified back to the server.
                     // https://github.com/kubernetes/community/blob/master/contributors/devel/api-conventions.md#metadata
                     // Add this test before traversing into other properties
                     patch.Test(path + "/resourceVersion", ((KubeResourceV1)original).Metadata.ResourceVersion);
                 }
                 // KubeObjects, compare properties recursively
-                foreach (PropertyInfo prop in original.GetType().GetProperties()) {
-                    JsonPropertyAttribute jsonAttribute = (JsonPropertyAttribute)prop.GetCustomAttribute(typeof(JsonPropertyAttribute));
+                foreach (PropertyInfo originalProp in original.GetType().GetProperties()) {
+                    if (original is KubeClient.Models.Tracked.ITracked && originalProp.Name == "__ModifiedProperties__") {
+                        continue;
+                    }
+                    PropertyInfo modifiedProp = modified.GetType().GetProperty(originalProp.Name);
+                    JsonPropertyAttribute jsonAttribute = (JsonPropertyAttribute)originalProp.GetCustomAttribute(typeof(JsonPropertyAttribute));
                     string propPath = path + "/" + escapeJsonPointer(jsonAttribute.PropertyName);
-                    object originalValue = prop.GetValue(original);
-                    object modifiedValue = prop.GetValue(modified);
+                    object originalValue = originalProp.GetValue(original);
+                    object modifiedValue = modifiedProp.GetValue(modified);
 
-                    if (!isPropertyUpdateable(original, prop)) {
+                    if (!isPropertyUpdateable(original, originalProp)) {
                         continue;
                     }
 
                     // Pass patch strategy attribute to diff function for the property we're looking at
-                    MergeStrategyAttribute attribute = (MergeStrategyAttribute)Attribute.GetCustomAttribute(prop, typeof(MergeStrategyAttribute));
+                    MergeStrategyAttribute attribute = (MergeStrategyAttribute)Attribute.GetCustomAttribute(originalProp, typeof(MergeStrategyAttribute));
                     CreateTwoWayPatch(
                         original: originalValue,
                         modified: modifiedValue,

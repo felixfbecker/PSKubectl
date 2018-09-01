@@ -19,7 +19,7 @@ namespace Kubectl {
         [Parameter(Mandatory = true, Position = 0, ValueFromPipeline = true)]
         public string InputObject;
 
-        private Dictionary<(string kind, string apiVersion), Type> modelTypes = ModelMetadata.KubeObject.BuildKindToTypeLookup(typeof(KubeObjectV1).Assembly);
+        private Dictionary<(string kind, string apiVersion), Type> modelTypes = ModelMetadata.KubeObject.BuildKindToTypeLookup(typeof(KubeObjectV1).Assembly, true);
 
         protected override async Task ProcessRecordAsync(CancellationToken cancellationToken) {
             await base.ProcessRecordAsync(cancellationToken);
@@ -33,7 +33,7 @@ namespace Kubectl {
             string kind = (string)obj["kind"];
             Type type = modelTypes.GetValueOrDefault((kind, apiVersion));
             if (type == null) {
-                WriteError(new ErrorRecord(new Exception($"Unknown apiVersion/kind {apiVersion}/{kind}. {modelTypes.Count} Known: {String.Join(", ", modelTypes.Keys)}"), null, ErrorCategory.InvalidData, InputObject));
+                WriteError(new ErrorRecord(new Exception($"Unknown (kind: {kind}, apiVersion: {apiVersion}). {modelTypes.Count} Known:\n{String.Join("\n", modelTypes.Keys)}"), null, ErrorCategory.InvalidData, InputObject));
                 return;
             }
             KubeResourceV1 resource = (KubeResourceV1)serializer.Deserialize(InputObject, type);
