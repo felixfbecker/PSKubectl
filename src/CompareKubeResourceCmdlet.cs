@@ -17,7 +17,7 @@ using Newtonsoft.Json.Serialization;
 
 namespace Kubectl {
     [Cmdlet(VerbsData.Compare, "KubeResource")]
-    [OutputType(new[] { typeof(JsonPatchDocument) })]
+    [OutputType(new[] { typeof(Operation) })]
     public sealed class CompareKubeResourceCmdlet : KubeCmdlet {
         [Parameter(Mandatory = true, Position = 0)]
         public object Original { get; set; }
@@ -80,7 +80,9 @@ namespace Kubectl {
                     patch: patch
                 );
             }
-            WriteObject(patch);
+            foreach (var operation in patch.Operations) {
+                WriteObject(operation);
+            }
         }
     }
 }
