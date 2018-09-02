@@ -15,21 +15,51 @@ using Newtonsoft.Json.Linq;
 using Newtonsoft.Json.Serialization;
 
 namespace Kubectl {
-    [Cmdlet(VerbsData.Update, "KubeResource", SupportsShouldProcess = true)]
+    [Cmdlet(VerbsData.Update, "KubeResource", SupportsShouldProcess = true, DefaultParameterSetName = "Path")]
     [OutputType(new[] { typeof(KubeResourceV1) })]
     public sealed class UpdateKubeResourceCmdlet : KubeApiCmdlet {
-        private const string lastAppliedConfigAnnotation = "kubectl.kubernetes.io/last-applied-configuration";
+        [Parameter(Mandatory = true, Position = 0, ParameterSetName = "Path", ValueFromPipeline = true, ValueFromPipelineByPropertyName = true)]
+        [Alias("FullName")]
+        [ValidateNotNullOrEmpty()]
+        [SupportsWildcards()]
+        public string Path { get; set; }
 
-        [Parameter(Mandatory = true, Position = 0, ValueFromPipeline = true)]
-        public dynamic Resource;
+        [Parameter(Mandatory = true, Position = 0, ValueFromPipeline = true, ParameterSetName = "Object")]
+        [ValidateNotNull()]
+        public object Resource { get; set; }
 
         protected override async Task ProcessRecordAsync(CancellationToken cancellationToken) {
             await base.ProcessRecordAsync(cancellationToken);
 
-            dynamic modified = Resource;
+            if (Path == null) {
+                // Object given
+                await updateResource(Resource, cancellationToken);
+            } else {
+                // File path given
+                var deserializer = new KubeYamlDeserializer(Logger, ModelTypes);
+                ProviderInfo provider;
+                // Resolve wildcards
+                var paths = GetResolvedProviderPathFromPSPath(Path, out provider);
+                foreach (var path in paths) {
+                    WriteVerbose($"Reading object from YAML file {path}");
+                    var yaml = await System.IO.File.ReadAllTextAsync(path, cancellationToken);
+                    var modified = deserializer.Deserialize(yaml);
+                    await updateResource(modified, cancellationToken);
+                }
+            }
+        }
+
+        private async Task updateResource(dynamic modified, CancellationToken cancellationToken) {
+            if (modified == null) throw new ArgumentNullException(nameof(modified));
 
             string kind = (string)modified.Kind;
+            if (String.IsNullOrEmpty(kind)) {
+                throw new Exception("Input object does not have Kind set");
+            }
             string apiGroupVersion = (string)modified.ApiVersion;
+            if (String.IsNullOrEmpty(apiGroupVersion)) {
+                throw new Exception("Input object does not have ApiVersion set");
+            }
             string apiVersion = apiGroupVersion.Split('/').Last();
 
             // Figure out the model class - needed for diffing
@@ -44,7 +74,7 @@ namespace Kubectl {
             string kubeNamespace = (string)metadata.Namespace;
 
             // Get current resource state from server
-            WriteVerbose($"Getting kind: {kind}, apiVersion: {apiVersion}, name: {name}, namespace: {kubeNamespace}");
+            WriteVerbose($"Getting resource \"{name}\" of kind \"{kind}\" from namespace \"{kubeNamespace}\"");
             object current = await client.Dynamic().Get(name, kind, apiVersion, kubeNamespace, cancellationToken);
             if (current == null) {
                 WriteError(new ErrorRecord(new Exception($"{kind} ({apiVersion}) \"{name}\" does not exist in namespace \"{kubeNamespace}\""), null, ErrorCategory.InvalidData, Resource));

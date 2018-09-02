@@ -47,13 +47,14 @@ The cmdlet accepts pipeline input from `Get-KubePod`.
 #### `Update-KubeResource`
 
 Equivalent to `kubectl apply`.
-Takes Kubernetes objects as pipeline input, will compare them with the state of that object on the server, generate a three-way patch and send it to the server.
+Takes Kubernetes objects or YAML file paths as pipeline or parameter input, compares them with the state of that object on the server, generates a three-way patch and sends it to the server.
 Supports `-WhatIf` and `-Confirm`.
 Prints the updated object returned by the server.
 
 Example:
 ```powershell
-Get-ChildItem *.yml -Recurse | Get-Content -Raw | ConvertFrom-KubeYaml | Update-KubeResource
+Update-KubeResource *.yml
+Get-ChildItem *.yml -Recurse | Update-KubeResource
 ```
 
 Editing a field before updating:
