@@ -61,13 +61,13 @@ Get-ChildItem *.Deployment.yml -Recurse |
     Update-KubeResource
 ```
 
-### `ConvertFrom-KubeYaml`
+#### `ConvertFrom-KubeYaml`
 
 Takes YAML strings as pipeline input, parses it and returns Kubernetes objects.
 The objects are PSObjects with only the properties from the YAML set (important for diffing purposes), but will have the correct type names set for pretty output formatting.
 Other cmdlets take these objects as input.
 
-### `Compare-KubeResource`
+#### `Compare-KubeResource`
 
 Compare two Kubernetes objects and output a JSON Patch.
 
