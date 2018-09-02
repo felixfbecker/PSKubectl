@@ -9,11 +9,11 @@
             </ScriptProperty>
             <ScriptProperty>
                 <Name>Restarts</Name>
-                <GetScriptBlock>($this.Status.ContainerStatuses.RestartCount | Measure-Object -Sum).Sum</GetScriptBlock>
+                <GetScriptBlock>(($this.Status.ContainerStatuses + $this.Status.InitContainerStatuses).RestartCount | Measure-Object -Sum).Sum</GetScriptBlock>
             </ScriptProperty>
             <ScriptProperty>
-                <Name>StartTime</Name>
-                <GetScriptBlock>$this.Status.StartTime</GetScriptBlock>
+                <Name>Age</Name>
+                <GetScriptBlock>New-TimeSpan -Start $this.Metadata.CreationTimestamp -End (Get-Date)</GetScriptBlock>
             </ScriptProperty>
         </Members>
     </Type>

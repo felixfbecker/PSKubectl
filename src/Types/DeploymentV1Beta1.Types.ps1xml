@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Types>
+    <Type>
+        <Name>KubeClient.Models.DeploymentV1Beta1</Name>
+        <Members>
+            <ScriptProperty>
+                <Name>Name</Name>
+                <GetScriptBlock>$this.Metadata.Name</GetScriptBlock>
+            </ScriptProperty>
+            <ScriptProperty>
+                <Name>Desired</Name>
+                <GetScriptBlock>$this.Spec.Replicas</GetScriptBlock>
+            </ScriptProperty>
+            <ScriptProperty>
+                <Name>Current</Name>
+                <GetScriptBlock>$this.Status.Replicas</GetScriptBlock>
+            </ScriptProperty>
+            <ScriptProperty>
+                <Name>Updated</Name>
+                <GetScriptBlock>$this.Status.UpdatedReplicas</GetScriptBlock>
+            </ScriptProperty>
+            <ScriptProperty>
+                <Name>Available</Name>
+                <GetScriptBlock>$this.Status.AvailableReplicas</GetScriptBlock>
+            </ScriptProperty>
+            <ScriptProperty>
+                <Name>Age</Name>
+                <GetScriptBlock>New-TimeSpan -Start $this.Metadata.CreationTimestamp -End (Get-Date)</GetScriptBlock>
+            </ScriptProperty>
+        </Members>
+    </Type>
+</Types>

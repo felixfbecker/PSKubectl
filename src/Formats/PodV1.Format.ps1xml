@@ -22,7 +22,7 @@
                         <Label>Restarts</Label>
                     </TableColumnHeader>
                     <TableColumnHeader>
-                        <Label>StartTime</Label>
+                        <Label>Age</Label>
                     </TableColumnHeader>
                 </TableHeaders>
                 <TableRowEntries>
@@ -32,16 +32,85 @@
                                 <PropertyName>Name</PropertyName>
                             </TableColumnItem>
                             <TableColumnItem>
-                                <ScriptBlock>"$(($_.Status.ContainerStatuses | Where-Object {$_.Ready} | Measure-Object).Count)/$($this.Status.ContainerStatuses.Count)"</ScriptBlock>
+                                <ScriptBlock>"$(($_.Status.ContainerStatuses | Where-Object {$_.Ready} | Measure-Object).Count)/$($_.Status.ContainerStatuses.Count)"</ScriptBlock>
                             </TableColumnItem>
+                            <!-- Cannot define this as Type extension because Status is a real property -->
                             <TableColumnItem>
-                                <ScriptBlock>$_.Status.Phase</ScriptBlock>
+                                <ScriptBlock>
+                                    $pod = $_
+                                    $reason = $pod.Status.Phase
+                                    if ($pod.Status.Reason) {
+                                        $reason = $pod.Status.Reason
+                                    }
+                                    $initializing = $false
+                                    $i = 0
+                                    foreach ($container in $pod.Status.InitContainerStatuses) {
+                                        if ($container.State.Terminated -and $container.State.Terminated.ExitCode -eq 0) {
+                                            $i++
+                                            continue
+                                        }
+                                        if ($container.State.Terminated) {
+                                            # initialization is failed
+                                            if ($container.State.Terminated.Reason) {
+                                                if ($container.State.Terminated.Signal -ne 0) {
+                                                    $reason = "Init:Signal:" + $container.State.Terminated.Signal
+                                                } else {
+                                                    $reason = "Init:ExitCode:" + $container.State.Terminated.ExitCode
+                                                }
+                                            } else {
+                                                $reason = "Init:" + $container.State.Terminated.Reason
+                                            }
+                                            $initializing = $true
+                                        } elseif ($container.State.Waiting -and $container.State.Waiting.Reason -and $container.State.Waiting.Reason -ne "PodInitializing") {
+                                            $reason = "Init:" + $container.State.Waiting.Reason
+                                            $initializing = $true
+                                        } else {
+                                            $reason = "Init:$i/$($pod.Spec.InitContainers.Count)"
+                                            $initializing = $true
+                                        }
+                                        break
+                                    }
+                                    if (-not $initializing) {
+                                        $restarts = 0
+                                        $hasRunning = $false
+                                        for ($i = $pod.Status.ContainerStatuses.Count - 1; $i -ge 0; $i--) {
+                                            $container = $pod.Status.ContainerStatuses[$i]
+                                            $restarts += $container.RestartCount
+                                            if ($container.State.Waiting -and $container.State.Waiting.Reason) {
+                                                Write-Information "here"
+                                                $reason = $container.State.Waiting.Reason
+                                            } elseif ($container.State.Terminated -and $container.State.Terminated.Reason) {
+                                                $reason = $container.State.Terminated.Reason
+                                            } elseif ($container.State.Terminated -and (-not $container.State.Terminated.Reason)) {
+                                                if ($container.State.Terminated.Signal -ne 0) {
+                                                    $reason = "Signal:" + $container.State.Terminated.Signal
+                                                } else {
+                                                    $reason = "ExitCode:" + $container.State.Terminated.ExitCode
+                                                }
+                                            } elseif ($container.Ready -and $container.State.Running) {
+                                                $hasRunning = $true
+                                                $readyContainers++
+                                            }
+                                        }
+
+                                        # change pod status back to "Running" if there is at least one container still reporting as "Running" status
+                                        if ($reason -eq "Completed" -and $hasRunning) {
+                                            $reason = "Running"
+                                        }
+                                    }
+                                    if ($pod.DeletionTimestamp -and $pod.Status.Reason -eq "NodeLost") {
+                                        $reason = "Unknown"
+                                    } elseif ($pod.DeletionTimestamp) {
+                                        $reason = "Terminating"
+                                    }
+                                    $reason
+                                </ScriptBlock>
                             </TableColumnItem>
                             <TableColumnItem>
                                 <PropertyName>Restarts</PropertyName>
                             </TableColumnItem>
                             <TableColumnItem>
-                                <PropertyName>StartTime</PropertyName>
+                                <PropertyName>Age</PropertyName>
                             </TableColumnItem>
                         </TableColumnItems>
                     </TableRowEntry>

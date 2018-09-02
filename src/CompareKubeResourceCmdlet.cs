@@ -20,14 +20,14 @@ namespace Kubectl {
     [OutputType(new[] { typeof(JsonPatchDocument) })]
     public sealed class CompareKubeResourceCmdlet : KubeCmdlet {
         [Parameter(Mandatory = true, Position = 0)]
-        public KubeResourceV1 Original { get; set; }
+        public object Original { get; set; }
 
         [Parameter(Mandatory = true, Position = 1)]
 
-        public KubeResourceV1 Modified { get; set; }
+        public object Modified { get; set; }
 
         [Parameter(Mandatory = true, Position = 2, ParameterSetName = "ThreeWay")]
-        public KubeResourceV1 Current { get; set; }
+        public object Current { get; set; }
 
         [Parameter(Mandatory = true, ParameterSetName = "ThreeWayFromLastApplied")]
         public SwitchParameter ThreeWayFromLastApplied { get; set; }
@@ -45,10 +45,19 @@ namespace Kubectl {
             await base.ProcessRecordAsync(cancellationToken);
             var patch = new JsonPatchDocument();
             var comparer = new KubeResourceComparer(LoggerFactory);
+            string apiGroupVersion = (string)Original.GetPropertyValue("ApiVersion");
+            string apiVersion = apiGroupVersion.Split('/').Last();
+            string kind = (string)Original.GetPropertyValue("Kind");
+            Type type = modelTypes.GetValueOrDefault((kind, apiVersion));
+            if (type == null) {
+                WriteError(new ErrorRecord(new Exception($"Unknown (kind: {kind}, apiVersion: {apiVersion}). {modelTypes.Count} Known:\n{String.Join("\n", modelTypes.Keys)}"), null, ErrorCategory.InvalidData, null));
+                return;
+            }
             if (ThreeWayFromLastApplied) {
                 comparer.CreateThreeWayPatchFromLastApplied(
                     current: Original,
                     modified: Modified,
+                    type: type,
                     patch: patch,
                     annotate: Annotate
                 );
@@ -56,6 +65,7 @@ namespace Kubectl {
                 comparer.CreateTwoWayPatch(
                     original: Original,
                     modified: Modified,
+                    type: type,
                     patch: patch,
                     ignoreDeletions: IgnoreDeletions,
                     ignoreAdditionsAndModifications: IgnoreAdditionsAndModifications
@@ -65,6 +75,7 @@ namespace Kubectl {
                     original: Original,
                     modified: Modified,
                     current: Current,
+                    type: type,
                     patch: patch
                 );
             }

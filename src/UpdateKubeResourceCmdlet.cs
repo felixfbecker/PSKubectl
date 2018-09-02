@@ -15,74 +15,65 @@ using Newtonsoft.Json.Linq;
 using Newtonsoft.Json.Serialization;
 
 namespace Kubectl {
-    [Cmdlet(VerbsData.Update, "KubeResource")]
+    [Cmdlet(VerbsData.Update, "KubeResource", SupportsShouldProcess = true)]
+    [OutputType(new[] { typeof(KubeResourceV1) })]
     public sealed class UpdateKubeResourceCmdlet : KubeApiCmdlet {
         private const string lastAppliedConfigAnnotation = "kubectl.kubernetes.io/last-applied-configuration";
 
         [Parameter(Mandatory = true, Position = 0, ValueFromPipeline = true)]
-        public PSObject Resource;
+        public object Resource;
 
         protected override async Task ProcessRecordAsync(CancellationToken cancellationToken) {
             await base.ProcessRecordAsync(cancellationToken);
-            var comparer = new KubeResourceComparer(LoggerFactory);
-            KubeResourceV1 modified = (KubeResourceV1)Resource.BaseObject;
-            KubeResourceV1 current = await client.Dynamic().Get(modified.Kind, modified.ApiVersion, modified.Metadata.Name, modified.Metadata.Namespace, cancellationToken);
 
-            var patch = new JsonPatchDocument();
-            comparer.CreateThreeWayPatchFromLastApplied(modified, current, patch, true);
-            if (ShouldProcess(modified.Metadata.Name, "patch")) {
-                await client.Dynamic().Patch(
-                    kind: modified.Kind,
-                    apiVersion: modified.ApiVersion,
-                    name: modified.Metadata.Name,
-                    kubeNamespace: modified.Metadata.Namespace,
-                    patch: patch,
-                    cancellationToken: cancellationToken
-                );
+            object modified = Resource;
+
+            string kind = (string)modified.GetPropertyValue("Kind");
+            string apiGroupVersion = (string)modified.GetPropertyValue("ApiVersion");
+            string apiVersion = apiGroupVersion.Split('/').Last();
+
+            // Figure out the model class - needed for diffing
+            Type type = modelTypes.GetValueOrDefault((kind, apiVersion));
+            if (type == null) {
+                WriteError(new ErrorRecord(new Exception($"Unknown (kind: {kind}, apiVersion: {apiVersion}). {modelTypes.Count} Known:\n{String.Join("\n", modelTypes.Keys)}"), null, ErrorCategory.InvalidData, Resource));
+                return;
             }
 
-            // if (Resource is DeploymentV1Beta1) {
-            //     DeploymentV1Beta1 modified = (DeploymentV1Beta1)Resource;
-            //     DeploymentV1Beta1 current = await client.DeploymentsV1Beta1().Get(Resource.Metadata.Name, Resource.Metadata.Namespace, cancellationToken);
+            object metadata = modified.GetPropertyValue("Metadata");
+            string name = (string)metadata.GetPropertyValue("Name");
+            string kubeNamespace = (string)metadata.GetPropertyValue("Namespace");
 
-            //     Action<JsonPatchDocument<DeploymentV1Beta1>> patchAction = deploymentPatch => {
-            //         var patch = new JsonPatchDocument();
-            //         comparer.CreateThreeWayPatch(original, modified, current, patch);
-            //         foreach (var operation in patch.Operations) {
-            //             deploymentPatch.Operations.Add(new Operation<DeploymentV1Beta1>(operation.op, operation.path, operation.from, operation.value));
-            //         }
-            //     };
+            // Get current resource state from server
+            WriteVerbose($"Getting kind: {kind}, apiVersion: {apiVersion}, name: {name}, namespace: {kubeNamespace}");
+            object current = await client.Dynamic().Get(name, kind, apiVersion, kubeNamespace, cancellationToken);
+            if (current == null) {
+                WriteError(new ErrorRecord(new Exception($"{kind} ({apiVersion}) \"{name}\" does not exist in namespace \"{kubeNamespace}\""), null, ErrorCategory.InvalidData, Resource));
+                return;
+            }
 
-            //     if (ShouldProcess(Resource.Metadata.Name, "patch")) {
-            //         await client.DeploymentsV1Beta1().Update(Resource.Metadata.Name, patchAction, Resource.Metadata.Namespace, cancellationToken);
-            //     }
-            // } else if (Resource is ServiceV1) {
-            //     ServiceV1 modified = (ServiceV1)Resource;
-            //     ServiceV1 current = await client.ServicesV1().Get(Resource.Metadata.Name, Resource.Metadata.Namespace, cancellationToken);
-            //     ServiceV1 original;
-            //     string originalJson = current.Metadata.Annotations[lastAppliedConfigAnnotation];
-            //     if (!String.IsNullOrEmpty(originalJson)) {
-            //         original = JsonConvert.DeserializeObject<ServiceV1>(originalJson);
-            //     } else {
-            //         original = modified;
-            //     }
+            // Generate three-way patch from current to modified
+            var patch = new JsonPatchDocument();
+            var comparer = new KubeResourceComparer(LoggerFactory);
+            comparer.CreateThreeWayPatchFromLastApplied(current, modified, type, patch, true);
 
-            //     Action<JsonPatchDocument<ServiceV1>> patchAction = servicePatch => {
-            //         var patch = new JsonPatchDocument();
-            //         comparer.CreateTwoWayPatch(current, modified, patch, ignoreDeletions: true);
-            //         comparer.CreateTwoWayPatch(original, modified, patch, ignoreAdditionsAndModifications: true);
-            //         foreach (var operation in patch.Operations) {
-            //             servicePatch.Operations.Add(new Operation<ServiceV1>(operation.op, operation.path, operation.from, operation.value));
-            //         }
-            //     };
+            WriteVerbose("Patch: " + JsonConvert.SerializeObject(patch, new JsonSerializerSettings
+            {
+                Formatting = Formatting.Indented,
+                Converters = new[] { new PSObjectJsonConverter() }
+            }));
 
-            //     if (ShouldProcess(Resource.Metadata.Name, "patch")) {
-            //         await client.ServicesV1().Update(Resource.Metadata.Name, patchAction, Resource.Metadata.Namespace, cancellationToken);
-            //     }
-            //     await client.ServicesV1().Update(Resource.Metadata.Name, patchAction, Resource.Metadata.Namespace, cancellationToken);
-            // } else {
-            //     throw new Exception($"Unssuported resource kind {Resource.Kind}");
-            // }
+            // Send patch to server
+            if (ShouldProcess($"Sending patch for {kind} \"{name}\" in namespace \"{kubeNamespace}\"", $"Send patch for {kind} \"{name}\" in namespace \"{kubeNamespace}\"?", "Confirm") && false) {
+                var result = await client.Dynamic().Patch(
+                    name: name,
+                    kind: kind,
+                    apiVersion: apiVersion,
+                    patch: patch,
+                    kubeNamespace: kubeNamespace,
+                    cancellationToken: cancellationToken
+                );
+                WriteObject(result);
+            }
         }
     }
 }

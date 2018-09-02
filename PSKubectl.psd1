@@ -63,6 +63,7 @@
     TypesToProcess   = @(
         'src/Types/Config.Types.ps1xml',
         'src/Types/Context.Types.ps1xml',
+        'src/Types/DeploymentV1Beta1.Types.ps1xml',
         'src/Types/PodV1.Types.ps1xml'
     )
 
@@ -70,6 +71,7 @@
     FormatsToProcess = @(
         'src/Formats/Config.Format.ps1xml',
         'src/Formats/JsonPatch.Operations.Operation.Format.ps1xml',
+        'src/Formats/DeploymentV1Beta1.Format.ps1xml',
         'src/Formats/PodV1.Format.ps1xml'
     )
 

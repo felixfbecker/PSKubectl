@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Management.Automation;
 using System.Reflection;
@@ -14,6 +15,9 @@ namespace Kubectl {
     public abstract class KubeCmdlet : AsyncCmdlet {
         protected ILogger Logger;
         protected ILoggerFactory LoggerFactory;
+
+        protected Dictionary<(string kind, string apiVersion), Type> modelTypes =
+            ModelMetadata.KubeObject.BuildKindToTypeLookup(typeof(KubeObjectV1).Assembly);
 
         protected override async Task BeginProcessingAsync(CancellationToken cancellationToken) {
             await base.BeginProcessingAsync(cancellationToken); ;
