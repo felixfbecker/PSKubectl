@@ -4,6 +4,7 @@
   "prCreation": "not-pending",
   "rangeStrategy": "replace",
   "nuget": {
-    "enabled": true
+    "enabled": true,
+    "rollbackPrs": false
   }
 }
