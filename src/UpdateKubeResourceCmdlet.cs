@@ -52,7 +52,8 @@ namespace Kubectl {
             }
 
             // Generate three-way patch from current to modified
-            var patch = new JsonPatchDocument();
+            // TODO do not pass the ContractResolver here once KubeClient allows customizing the serialisation
+            var patch = new JsonPatchDocument(new List<Operation>(), new PSObjectAwareContractResolver());
             var comparer = new KubeResourceComparer(LoggerFactory);
             comparer.CreateThreeWayPatchFromLastApplied(current, modified, type, patch, true);
 

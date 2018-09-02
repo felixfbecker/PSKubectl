@@ -43,7 +43,8 @@ namespace Kubectl {
 
         protected override async Task ProcessRecordAsync(CancellationToken cancellationToken) {
             await base.ProcessRecordAsync(cancellationToken);
-            var patch = new JsonPatchDocument();
+            // TODO do not pass the ContractResolver here once KubeClient allows customizing the serialisation
+            var patch = new JsonPatchDocument(new List<Operation>(), new PSObjectAwareContractResolver());
             var comparer = new KubeResourceComparer(LoggerFactory);
             string apiGroupVersion = (string)Original.GetPropertyValue("ApiVersion");
             string apiVersion = apiGroupVersion.Split('/').Last();
