@@ -13,7 +13,7 @@ namespace Kubectl {
     [Cmdlet(VerbsCommon.Get, "KubeDeployment")]
     [OutputType(new[] { typeof(DeploymentV1Beta1) })]
     public sealed class GetKubeDeploymentCmdlet : KubeApiCmdlet {
-        [Parameter()]
+        [Parameter(ValueFromPipelineByPropertyName = true)]
         public string Namespace { get; set; }
 
         [Parameter()]

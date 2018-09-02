@@ -13,7 +13,7 @@ namespace Kubectl {
     [Cmdlet(VerbsCommon.Get, "KubePod")]
     [OutputType(new[] { typeof(PodV1) })]
     public sealed class GetKubePodCmdlet : KubeApiCmdlet {
-        [Parameter()]
+        [Parameter(ValueFromPipelineByPropertyName = true)]
         public string Namespace { get; set; }
 
         [Parameter()]

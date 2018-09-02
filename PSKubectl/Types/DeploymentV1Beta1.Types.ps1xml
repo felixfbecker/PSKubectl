@@ -8,6 +8,10 @@
                 <GetScriptBlock>$this.Metadata.Name</GetScriptBlock>
             </ScriptProperty>
             <ScriptProperty>
+                <Name>Namespace</Name>
+                <GetScriptBlock>$this.Metadata.Namespace</GetScriptBlock>
+            </ScriptProperty>
+            <ScriptProperty>
                 <Name>Desired</Name>
                 <GetScriptBlock>$this.Spec.Replicas</GetScriptBlock>
             </ScriptProperty>
