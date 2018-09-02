@@ -8,7 +8,7 @@
     <ItemGroup>
         <!-- <ProjectReference Include="../../tintoy/dotnet-kube-client/src/KubeClient/KubeClient.csproj" /> -->
         <!-- <ProjectReference Include="../../tintoy/dotnet-kube-client/src/KubeClient.Extensions.KubeConfig/KubeClient.Extensions.KubeConfig.csproj" /> -->
-        <PackageReference Include="KubeClient" Version="2.2.0-dynamic-client0047" />
+        <PackageReference Include="KubeClient" Version="2.1.6" />
         <PackageReference Include="KubeClient.Extensions.KubeConfig" Version="2.2.0-dynamic-client0047" />
         <PackageReference Include="Microsoft.AspNetCore.JsonPatch" Version="2.1.1" />
         <PackageReference Include="Microsoft.PowerShell.SDK" Version="6.0.4" />
