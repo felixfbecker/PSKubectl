@@ -6,12 +6,12 @@ param(
 )
 
 try {
-    Push-Location $PSScriptRoot
+    Push-Location "$PSScriptRoot/src"
     $options = @()
     if ($NoRestore) {
         $options += '--no-restore'
     }
-    dotnet publish -o ./PSKubectl/Assemblies -c $Configuration @options
+    dotnet publish -o ../PSKubectl/Assemblies -c $Configuration @options
     if ($LASTEXITCODE -ne 0) {
         throw "Build failed"
     }
