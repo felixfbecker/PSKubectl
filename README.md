@@ -74,7 +74,7 @@ Compare two Kubernetes objects and output a JSON Patch.
 Example that replicates the logic of `Update-KubeResource`:
 ```powershell
 $modified = Get-Content -Raw deployment.yml | ConvertFrom-KubeYaml
-$original = Get-KubeDeployment -Name $modified.Metadata.Name -Namespace $modified.Metadata.Namespace
+$original = $modified | Get-KubeDeployment
 Compare-KubeResource -Original $original -Modified $modified -ThreeWayFromLastApplied -Annotate
 ```
 
