@@ -10,5 +10,5 @@ phases:
         inputs:
           version: '2.1.400'
         displayName: 'Install .NET Core SDK'
-      - powershell: ./build.ps1 -Configuration Release
+      - powershell: ./build.ps1
         displayName: Build assemblies
