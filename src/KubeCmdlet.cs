@@ -23,9 +23,9 @@ namespace Kubectl {
             await base.BeginProcessingAsync(cancellationToken); ;
             LoggerFactory = new LoggerFactory();
             LoggerFactory.AddProvider(new CmdletLoggerProvider(this));
-            var logFile = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "..", "logs", "PSKubectl-{Date}.log");
-            WriteVerbose($"Logging to {logFile}");
-            LoggerFactory.AddFile(logFile, LogLevel.Trace);
+            // var logFile = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "..", "logs", "PSKubectl-{Date}.log");
+            // WriteVerbose($"Logging to {logFile}");
+            // LoggerFactory.AddFile(logFile, LogLevel.Trace);
             Logger = LoggerFactory.CreateLogger("KubeCmdlet");
         }
 
