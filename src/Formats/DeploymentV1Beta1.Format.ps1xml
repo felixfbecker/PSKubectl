@@ -48,6 +48,8 @@
                             </TableColumnItem>
                             <TableColumnItem>
                                 <PropertyName>Age</PropertyName>
+                                <FormatString>%d\D\ hh\h\ mm\m\ ss\s</FormatString>
+                                <Alignment>Right</Alignment>
                             </TableColumnItem>
                         </TableColumnItems>
                     </TableRowEntry>
