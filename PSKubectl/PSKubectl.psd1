@@ -86,9 +86,10 @@
         'Compare-KubeResource',
         'ConvertFrom-KubeYaml',
         'Get-KubeConfig',
+        'Get-KubeDeployment',
         'Get-KubeLog',
         'Get-KubePod',
-        'Get-KubeDeployment',
+        'Get-KubeResource',
         'Set-KubeConfig',
         'Update-KubeResource',
         'Use-KubeContext'

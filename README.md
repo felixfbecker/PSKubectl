@@ -28,12 +28,15 @@ $PSDefaultParameterValues['*-Kube*:ApiEndPoint'] = 'http://127.0.0.1:8001'
 
 ### App Management
 
-#### `Get-KubePod`/`Get-KubeDeployment`
+#### `Get-KubeResource`
 
-Equivalent to `kubectl get pods`/`deployments` and `kubectl describe pod`/`deployment`.
+Equivalent to `kubectl get` and `kubectl describe`.
+Just like with those, the first parameter is the kind of resource to get.
 The default output formatting mirrors the tabular output of `kubectl get`, but you can get all Pod properties from the returned objects.
 The `Name` parameter supports wildcard patterns, which can be very convenient to get all pods for a deployment (e.g. `Get-KubePod my-deployment-*`).
 Pass the namespace with `-Namespace`.
+
+There are also specialised cmdlets for common kinds like `Get-KubePod` and `Get-KubeDeployment`. They work the same way, but without `Kind` parameter.
 
 #### `Get-KubeLog`
 

@@ -16,8 +16,11 @@ namespace Kubectl {
         protected ILogger Logger;
         protected ILoggerFactory LoggerFactory;
 
-        protected Dictionary<(string kind, string apiVersion), Type> modelTypes =
+        protected Dictionary<(string kind, string apiVersion), Type> ModelTypes { get; } =
             ModelMetadata.KubeObject.BuildKindToTypeLookup(typeof(KubeObjectV1).Assembly);
+
+        protected Dictionary<(string kind, string apiVersion), Type> ListModelTypes { get; } =
+            ModelMetadata.KubeObject.BuildKindToListTypeLookup(typeof(KubeObjectV1).Assembly);
 
         protected override async Task BeginProcessingAsync(CancellationToken cancellationToken) {
             await base.BeginProcessingAsync(cancellationToken); ;

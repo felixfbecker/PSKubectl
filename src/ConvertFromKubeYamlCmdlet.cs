@@ -33,9 +33,9 @@ namespace Kubectl {
             string apiGroupVersion = (string)dict["apiVersion"];
             string apiVersion = apiGroupVersion.Split('/').Last();
             WriteVerbose($"apiVersion {apiVersion}");
-            Type type = modelTypes.GetValueOrDefault((kind, apiVersion));
+            Type type = ModelTypes.GetValueOrDefault((kind, apiVersion));
             if (type == null) {
-                WriteError(new ErrorRecord(new Exception($"Unknown (kind: {kind}, apiVersion: {apiVersion}). {modelTypes.Count} Known:\n{String.Join("\n", modelTypes.Keys)}"), null, ErrorCategory.InvalidData, InputObject));
+                WriteError(new ErrorRecord(new Exception($"Unknown (kind: {kind}, apiVersion: {apiVersion}). {ModelTypes.Count} Known:\n{String.Join("\n", ModelTypes.Keys)}"), null, ErrorCategory.InvalidData, InputObject));
                 return;
             }
             var resource = toPSObject(dict, type);

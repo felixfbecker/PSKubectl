@@ -49,9 +49,9 @@ namespace Kubectl {
             string apiGroupVersion = (string)Original.ApiVersion;
             string apiVersion = apiGroupVersion.Split('/').Last();
             string kind = (string)Original.Kind;
-            Type type = modelTypes.GetValueOrDefault((kind, apiVersion));
+            Type type = ModelTypes.GetValueOrDefault((kind, apiVersion));
             if (type == null) {
-                WriteError(new ErrorRecord(new Exception($"Unknown (kind: {kind}, apiVersion: {apiVersion}). {modelTypes.Count} Known:\n{String.Join("\n", modelTypes.Keys)}"), null, ErrorCategory.InvalidData, null));
+                WriteError(new ErrorRecord(new Exception($"Unknown (kind: {kind}, apiVersion: {apiVersion}). {ModelTypes.Count} Known:\n{String.Join("\n", ModelTypes.Keys)}"), null, ErrorCategory.InvalidData, null));
                 return;
             }
             if (ThreeWayFromLastApplied) {

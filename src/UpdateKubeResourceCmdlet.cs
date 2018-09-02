@@ -33,9 +33,9 @@ namespace Kubectl {
             string apiVersion = apiGroupVersion.Split('/').Last();
 
             // Figure out the model class - needed for diffing
-            Type type = modelTypes.GetValueOrDefault((kind, apiVersion));
+            Type type = ModelTypes.GetValueOrDefault((kind, apiVersion));
             if (type == null) {
-                WriteError(new ErrorRecord(new Exception($"Unknown (kind: {kind}, apiVersion: {apiVersion}). {modelTypes.Count} Known:\n{String.Join("\n", modelTypes.Keys)}"), null, ErrorCategory.InvalidData, Resource));
+                WriteError(new ErrorRecord(new Exception($"Unknown (kind: {kind}, apiVersion: {apiVersion}). {ModelTypes.Count} Known:\n{String.Join("\n", ModelTypes.Keys)}"), null, ErrorCategory.InvalidData, Resource));
                 return;
             }
 
