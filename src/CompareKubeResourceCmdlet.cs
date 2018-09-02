@@ -20,14 +20,14 @@ namespace Kubectl {
     [OutputType(new[] { typeof(Operation) })]
     public sealed class CompareKubeResourceCmdlet : KubeCmdlet {
         [Parameter(Mandatory = true, Position = 0)]
-        public object Original { get; set; }
+        public dynamic Original { get; set; }
 
         [Parameter(Mandatory = true, Position = 1)]
 
-        public object Modified { get; set; }
+        public dynamic Modified { get; set; }
 
         [Parameter(Mandatory = true, Position = 2, ParameterSetName = "ThreeWay")]
-        public object Current { get; set; }
+        public dynamic Current { get; set; }
 
         [Parameter(Mandatory = true, ParameterSetName = "ThreeWayFromLastApplied")]
         public SwitchParameter ThreeWayFromLastApplied { get; set; }
@@ -46,9 +46,9 @@ namespace Kubectl {
             // TODO do not pass the ContractResolver here once KubeClient allows customizing the serialisation
             var patch = new JsonPatchDocument(new List<Operation>(), new PSObjectAwareContractResolver());
             var comparer = new KubeResourceComparer(LoggerFactory);
-            string apiGroupVersion = (string)Original.GetPropertyValue("ApiVersion");
+            string apiGroupVersion = (string)Original.ApiVersion;
             string apiVersion = apiGroupVersion.Split('/').Last();
-            string kind = (string)Original.GetPropertyValue("Kind");
+            string kind = (string)Original.Kind;
             Type type = modelTypes.GetValueOrDefault((kind, apiVersion));
             if (type == null) {
                 WriteError(new ErrorRecord(new Exception($"Unknown (kind: {kind}, apiVersion: {apiVersion}). {modelTypes.Count} Known:\n{String.Join("\n", modelTypes.Keys)}"), null, ErrorCategory.InvalidData, null));

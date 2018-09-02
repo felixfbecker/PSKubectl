@@ -21,15 +21,15 @@ namespace Kubectl {
         private const string lastAppliedConfigAnnotation = "kubectl.kubernetes.io/last-applied-configuration";
 
         [Parameter(Mandatory = true, Position = 0, ValueFromPipeline = true)]
-        public object Resource;
+        public dynamic Resource;
 
         protected override async Task ProcessRecordAsync(CancellationToken cancellationToken) {
             await base.ProcessRecordAsync(cancellationToken);
 
-            object modified = Resource;
+            dynamic modified = Resource;
 
-            string kind = (string)modified.GetPropertyValue("Kind");
-            string apiGroupVersion = (string)modified.GetPropertyValue("ApiVersion");
+            string kind = (string)modified.Kind;
+            string apiGroupVersion = (string)modified.ApiVersion;
             string apiVersion = apiGroupVersion.Split('/').Last();
 
             // Figure out the model class - needed for diffing
@@ -39,9 +39,9 @@ namespace Kubectl {
                 return;
             }
 
-            object metadata = modified.GetPropertyValue("Metadata");
-            string name = (string)metadata.GetPropertyValue("Name");
-            string kubeNamespace = (string)metadata.GetPropertyValue("Namespace");
+            dynamic metadata = modified.Metadata;
+            string name = (string)metadata.Name;
+            string kubeNamespace = (string)metadata.Namespace;
 
             // Get current resource state from server
             WriteVerbose($"Getting kind: {kind}, apiVersion: {apiVersion}, name: {name}, namespace: {kubeNamespace}");

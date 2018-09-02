@@ -8,7 +8,7 @@ namespace Kubectl {
         /// If the property does not exist on the .NET object, will throw an Exception.
         /// If the property does not exist on a PSObject, will return null.
         /// </summary>
-        public static object GetPropertyValue(this object obj, string propertyName) {
+        public static object GetDynamicPropertyValue(this object obj, string propertyName) {
             if (obj == null) {
                 throw new ArgumentNullException(nameof(obj));
             }
