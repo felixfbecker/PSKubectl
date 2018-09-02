@@ -64,7 +64,7 @@ namespace Kubectl {
             }));
 
             // Send patch to server
-            if (ShouldProcess($"Sending patch for {kind} \"{name}\" in namespace \"{kubeNamespace}\"", $"Send patch for {kind} \"{name}\" in namespace \"{kubeNamespace}\"?", "Confirm") && false) {
+            if (ShouldProcess($"Sending patch for {kind} \"{name}\" in namespace \"{kubeNamespace}\"", $"Send patch for {kind} \"{name}\" in namespace \"{kubeNamespace}\"?", "Confirm")) {
                 var result = await client.Dynamic().Patch(
                     name: name,
                     kind: kind,
