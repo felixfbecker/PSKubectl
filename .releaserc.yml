@@ -1,0 +1,24 @@
+verifyConditions:
+  - '@semantic-release/github'
+prepare:
+  - path: '@semantic-release/exec'
+    cmd: pwsh build.ps1 -Configuration Release
+  - path: '@semantic-release/exec'
+    shell: pwsh
+    cmd: |
+      Update-ModuleManifest -ErrorAction Stop -Path ./PSKubectl/PSKubectl.psd1 -ModuleVersion '${nextRelease.version}' -ReleaseNotes @'
+      ${nextRelease.notes}
+      '@.Trim()
+publish:
+  - path: '@semantic-release/exec'
+    shell: pwsh
+    cmd: |
+      & {
+        $ErrorActionPreference = 'Stop'
+        Publish-Module -Path ./PSKubectl -NuGetApiKey $env:NUGET_API_KEY
+        ConvertTo-Json @{
+          name = 'PowerShell Gallery'
+          url = 'https://www.powershellgallery.com/packages/PSKubectl'
+        }
+      }
+  - path: '@semantic-release/github'

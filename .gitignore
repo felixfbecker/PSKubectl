@@ -1,5 +1,7 @@
 /out/
+/PSKubectl/Assemblies/
 /logs/
+/node_modules/
 
 # Autosave files
 *~
@@ -41,3 +43,4 @@ Thumbs.db
 
 # dotCover
 *.dotCover
+

@@ -9,7 +9,7 @@
 @{
 
     # Script module or binary module file associated with this manifest.
-    RootModule       = 'out/PSKubectl.dll'
+    RootModule       = 'Assemblies/PSKubectl.dll'
 
     # Version number of this module.
     ModuleVersion    = '0.0.1'
@@ -61,18 +61,18 @@
 
     # Type files (.ps1xml) to be loaded when importing this module
     TypesToProcess   = @(
-        'src/Types/Config.Types.ps1xml',
-        'src/Types/Context.Types.ps1xml',
-        'src/Types/DeploymentV1Beta1.Types.ps1xml',
-        'src/Types/PodV1.Types.ps1xml'
+        'Types/Config.Types.ps1xml',
+        'Types/Context.Types.ps1xml',
+        'Types/DeploymentV1Beta1.Types.ps1xml',
+        'Types/PodV1.Types.ps1xml'
     )
 
     # Format files (.ps1xml) to be loaded when importing this module
     FormatsToProcess = @(
-        'src/Formats/Config.Format.ps1xml',
-        'src/Formats/JsonPatch.Operations.Operation.Format.ps1xml',
-        'src/Formats/DeploymentV1Beta1.Format.ps1xml',
-        'src/Formats/PodV1.Format.ps1xml'
+        'Formats/Config.Format.ps1xml',
+        'Formats/JsonPatch.Operations.Operation.Format.ps1xml',
+        'Formats/DeploymentV1Beta1.Format.ps1xml',
+        'Formats/PodV1.Format.ps1xml'
     )
 
     # Modules to import as nested modules of the module specified in RootModule/ModuleToProcess
@@ -118,10 +118,10 @@
             Tags       = @('kubectl', 'kubernetes', 'k8s', 'container', 'orchestration')
 
             # A URL to the license for this module.
-            LicenseUri = 'https://github.com/felixfbecker/ps-kubectl/blob/master/LICENSE.txt'
+            LicenseUri = 'https://github.com/felixfbecker/PSKubectl/blob/master/LICENSE'
 
             # A URL to the main website for this project.
-            ProjectUri = 'https://github.com/felixfbecker/ps-kubectl'
+            ProjectUri = 'https://github.com/felixfbecker/PSKubectl'
 
             # A URL to an icon representing this module.
             IconUri    = 'https://github.com/kubernetes/kubernetes/raw/31420467ae9503850515786660fa3e93e9d140b2/logo/logo.png'

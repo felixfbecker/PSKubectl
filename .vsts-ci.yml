@@ -1,15 +1,36 @@
 name: $(BuildID)
+trigger:
+  branches:
+    include:
+      - master
+      - renovate/*
 
 phases:
   - template: .vsts/template.yml
     parameters:
-      name: Linux
+      name: test_linux
       queue: 'Hosted Linux Preview'
   - template: .vsts/template.yml
     parameters:
-      name: macOS
+      name: test_macos
       queue: 'Hosted macOS Preview'
   - template: .vsts/template.yml
     parameters:
-      name: Windows
+      name: test_windows
       queue: 'Hosted VS2017'
+  - phase: release
+    queue: 'Hosted Linux Preview'
+    condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
+    dependsOn:
+      - test_linux
+      - test_macos
+      - test_windows
+    steps:
+      - task: NodeTool@0
+        inputs:
+          versionSpec: ^10.3.0
+      - bash: npm ci && ./node_modules/.bin/semantic-release
+        env:
+          NUGET_API_KEY: $(NuGetApiKey)
+          GITHUB_TOKEN: $(GitHubToken)
+        displayName: Run semantic-release
