@@ -47,7 +47,7 @@ namespace Kubectl {
         /// Dictionaries and Lists depending on the given type
         /// </summary>
         private object toPSObject(object value, Type type) {
-            Logger.LogDebug($"Type {type.Name}");
+            Logger.LogTrace($"Type {type.Name}");
             if (type == null) {
                 throw new ArgumentNullException(nameof(type));
             }
@@ -55,7 +55,7 @@ namespace Kubectl {
                 return value;
             }
             if (type == typeof(string) || type.IsValueType) {
-                Logger.LogDebug("Is scalar");
+                Logger.LogTrace("Is scalar");
                 if (value.GetType() != typeof(string) && !value.GetType().IsValueType) {
                     throw new Exception($"Invalid type: Expected {type.Name}, got {value.GetType().Name}");
                 }
@@ -69,14 +69,14 @@ namespace Kubectl {
                 return Convert.ChangeType(value, type);
             }
             if (type.IsGenericType) {
-                Logger.LogDebug("Is generic");
+                Logger.LogTrace("Is generic");
                 if (type.GetGenericTypeDefinition() == typeof(List<>)) {
-                    Logger.LogDebug("Is list");
+                    Logger.LogTrace("Is list");
                     var valueType = type.GetGenericArguments()[0];
                     return ((IList)value).Cast<object>().Select(element => toPSObject(element, valueType)).ToList();
                 }
                 if (type.GetGenericTypeDefinition() == typeof(Dictionary<,>)) {
-                    Logger.LogDebug("Is map");
+                    Logger.LogTrace("Is map");
                     var valueType = type.GetGenericArguments()[1];
                     // Shadowed type is map too
                     var dict = new Dictionary<string, object>();
@@ -86,7 +86,7 @@ namespace Kubectl {
                     return dict;
                 }
             }
-            Logger.LogDebug("Is other object");
+            Logger.LogTrace("Is other object");
             // Shadowed type is a kube model object, only copy the properties set in the map for diffing purposes
             var psObject = new PSObject();
             foreach (DictionaryEntry entry in ((IDictionary)value)) {
@@ -95,7 +95,7 @@ namespace Kubectl {
                 if (prop == null) {
                     throw new Exception($"Unknown property {key} on type {type.Name}");
                 }
-                Logger.LogDebug($"Property {prop.Name}");
+                Logger.LogTrace($"Property {prop.Name}");
                 psObject.Properties.Add(new PSNoteProperty(prop.Name, toPSObject(entry.Value, prop.PropertyType)));
             }
             // Add type name for output formatting
