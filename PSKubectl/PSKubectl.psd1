@@ -94,6 +94,7 @@
         'Get-KubeLog',
         'Get-KubePod',
         'Get-KubeResource',
+        'Get-KubeResourceKinds',
         'Set-KubeConfig',
         'Update-KubeResource',
         'Use-KubeContext'
