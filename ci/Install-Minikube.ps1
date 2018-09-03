@@ -22,38 +22,39 @@ sudo minikube start --vm-driver=none --kubernetes-version=$KubernetesVersion
 # Fix the kubectl context, as it's often stale.
 minikube update-context
 
-# Wait for Kubernetes to be up and ready.
-$timer = [Diagnostics.Stopwatch]::StartNew()
-while ($true) {
-    try {
-        Write-Information "Waiting for node to be ready"
-        $nodes = (Invoke-Executable { kubectl get nodes -o json } | ConvertFrom-Json).Items
-        $conditions = $nodes.Status.Conditions
-        Write-Information "Conditions:"
-        $conditions
-        if (($conditions | Where-Object { $_.Type -eq 'Ready' -and $_.Status -eq 'True' })) {
-            break
+# Little helper to poll a command until the resource status reports a {Type: Ready, Status: True} condition
+function Wait-KubeConditions([scriptblock] $Command, [string]$Label) {
+    $timer = [Diagnostics.Stopwatch]::StartNew()
+    while ($true) {
+        try {
+            Write-Information "Waiting for $Label to be ready"
+            $resources = (Invoke-Executable $Command | ConvertFrom-Json).Items
+            $conditions = $resources.Status.Conditions
+            Write-Information "Conditions:"
+            $conditions
+            if (($conditions | Where-Object { $_.Type -eq 'Ready' -and $_.Status -eq 'True' })) {
+                break
+            }
+        } catch {
+            Write-Warning $_
         }
-    } catch {
-        Write-Information $_
+        Start-Sleep 1
+        if ($timer.Elapsed.TotalSeconds -gt 60) {
+            throw "Timed out after 60s waiting for node to become ready"
+        }
     }
-    Start-Sleep 1
-    if ($timer.Elapsed.TotalSeconds -gt 60) {
-        throw "Timed out after 60s waiting for node to become ready"
-    }
+    $timer.Stop()
+    Write-Information "$Label ready"
 }
-$timer.Stop()
 
-Write-Information "Node ready"
+# Wait for Kubernetes to be up and ready.
+Wait-KubeConditions -Command { kubectl get nodes -o json } -Label 'Node'
 
-kubectl cluster-info
+Invoke-Executable { kubectl cluster-info }
 
-# # Verify kube-addon-manager.
-# # kube-addon-manager is responsible for managing other kubernetes components, such as kube-dns, dashboard, storage-provisioner..
-# JSONPATH='{range .items[*]}{@.metadata.name}:{range @.status.conditions[*]}{@.type}={@.status};{end}{end}'; until kubectl -n kube-system get pods -lcomponent=kube-addon-manager -o jsonpath="$JSONPATH" 2>&1 | grep -q "Ready=True"; do sleep 1;echo "waiting for kube-addon-manager to be available"; kubectl get pods --all-namespaces; done
-# # Wait for kube-dns to be ready.
-# JSONPATH='{range .items[*]}{@.metadata.name}:{range @.status.conditions[*]}{@.type}={@.status};{end}{end}'; until kubectl -n kube-system get pods -lk8s-app=kube-dns -o jsonpath="$JSONPATH" 2>&1 | grep -q "Ready=True"; do sleep 1;echo "waiting for kube-dns to be available"; kubectl get pods --all-namespaces; done
-# # Create example Redis deployment on Kubernetes.
-# kubectl run travis-example --image=redis --labels="app=travis-example"
-# # Make sure created pod is scheduled and running.
-# JSONPATH='{range .items[*]}{@.metadata.name}:{range @.status.conditions[*]}{@.type}={@.status};{end}{end}'; until kubectl -n default get pods -lapp=travis-example -o jsonpath="$JSONPATH" 2>&1 | grep -q "Ready=True"; do sleep 1;echo "waiting for travis-example deployment to be available"; kubectl get pods -n default; done
+# Verify kube-addon-manager.
+# kube-addon-manager is responsible for managing other kubernetes components, such as kube-dns, dashboard, storage-provisioner..
+Wait-KubeConditions -Command { kubectl -n kube-system get pods -lcomponent=kube-addon-manager -o json } -Label 'kube-addon-manager'
+
+# Wait for kube-dns to be ready.
+Wait-KubeConditions -Command { kubectl -n kube-system get pods -lk8s-app=kube-dns -o json } -Label 'kube-dns'
