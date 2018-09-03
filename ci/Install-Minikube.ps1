@@ -1,5 +1,7 @@
 Import-Module "$PSScriptRoot/../Tests/Invoke-Executable.psm1"
 
+# $env:CHANGE_MINIKUBE_NONE_USER = 'true'
+
 # Download kubectl, which is a requirement for using minikube.
 curl -Lo kubectl https://storage.googleapis.com/kubernetes-release/release/v1.9.0/bin/linux/amd64/kubectl
 chmod +x kubectl
@@ -17,13 +19,17 @@ minikube update-context
 # Wait for Kubernetes to be up and ready.
 $timer = [Diagnostics.Stopwatch]::StartNew()
 while ($true) {
-    Write-Information "Waiting for node to be ready"
-    $nodes = (Invoke-Executable { kubectl get nodes -o json } | ConvertFrom-Json).Items
-    $conditions = $nodes.Status.Conditions
-    Write-Information "Conditions:"
-    $conditions
-    if (($conditions | Where-Object { $_.Type -eq 'Ready' -and $_.Status -eq 'True' })) {
-        break
+    try {
+        Write-Information "Waiting for node to be ready"
+        $nodes = (Invoke-Executable { kubectl get nodes -o json } | ConvertFrom-Json).Items
+        $conditions = $nodes.Status.Conditions
+        Write-Information "Conditions:"
+        $conditions
+        if (($conditions | Where-Object { $_.Type -eq 'Ready' -and $_.Status -eq 'True' })) {
+            break
+        }
+    } catch {
+        Write-Information $_
     }
     Start-Sleep 1
     if ($timer.Elapsed.TotalSeconds -gt 60) {
