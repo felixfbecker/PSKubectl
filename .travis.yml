@@ -18,6 +18,7 @@ env:
     # This moves Kubernetes specific config files.
     - CHANGE_MINIKUBE_NONE_USER=true
     - DOTNET_SKIP_FIRST_TIME_EXPERIENCE=true
+    - FORCE_COLOR=1
 
 install:
   - pwsh-preview ./ci/Install-Minikube.ps1 -KubectlVersion v1.9.0 -MinikubeVersion v0.25.2 -KubernetesVersion v1.9.0
