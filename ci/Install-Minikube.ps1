@@ -1,6 +1,6 @@
 Import-Module "$PSScriptRoot/../Tests/Invoke-Executable.psm1"
 
-# $env:CHANGE_MINIKUBE_NONE_USER = 'true'
+$env:CHANGE_MINIKUBE_NONE_USER = 'true'
 
 # Download kubectl, which is a requirement for using minikube.
 curl -Lo kubectl https://storage.googleapis.com/kubernetes-release/release/v1.9.0/bin/linux/amd64/kubectl
