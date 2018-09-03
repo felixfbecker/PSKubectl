@@ -1,7 +1,6 @@
 parameters:
   name: ''
   queue: ''
-  installMinikube: ''
 
 phases:
   - phase: ${{ parameters.name }}
@@ -15,5 +14,3 @@ phases:
         env:
           DOTNET_SKIP_FIRST_TIME_EXPERIENCE: 'true'
         displayName: Build assemblies
-      - powershell: ${{ parameters.installMinikube }}
-        displayName: Install Minikube
