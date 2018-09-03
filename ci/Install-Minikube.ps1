@@ -18,8 +18,10 @@ minikube update-context
 while ($true) {
     Write-Information "Waiting for node to be ready"
     $nodes = (Invoke-Executable { kubectl get nodes -o json } | ConvertFrom-Json).Items
-    $nodes
-    if (($nodes.Status.Conditions | Where-Object { $_.Type -eq 'Ready' -and $_.Status -eq 'True' })) {
+    $conditions = $nodes.Status.Conditions
+    Write-Information "Conditions:"
+    $conditions
+    if (($conditions | Where-Object { $_.Type -eq 'Ready' -and $_.Status -eq 'True' })) {
         break
     }
     Start-Sleep 1
