@@ -9,18 +9,18 @@ Import-Module "$PSScriptRoot/../Tests/Invoke-Executable.psm1"
 $env:CHANGE_MINIKUBE_NONE_USER = 'true'
 
 # Download kubectl, which is a requirement for using minikube.
-curl -Lo kubectl "https://storage.googleapis.com/kubernetes-release/release/$KubectlVersion/bin/linux/amd64/kubectl"
-chmod +x kubectl
-sudo mv kubectl /usr/local/bin/
+Invoke-WebRequest -OutFile kubectl -Uri "https://storage.googleapis.com/kubernetes-release/release/$KubectlVersion/bin/linux/amd64/kubectl"
+Invoke-Executable { chmod +x kubectl }
+Invoke-Executable { sudo mv kubectl /usr/local/bin/ }
 
 # Download minikube.
-curl -Lo minikube "https://storage.googleapis.com/minikube/releases/$MinikubeVersion/minikube-linux-amd64"
-chmod +x minikube
-sudo mv minikube /usr/local/bin/
-sudo minikube start --vm-driver=none --kubernetes-version=$KubernetesVersion
+Invoke-WebRequest -OutFile minikube -Uri "https://storage.googleapis.com/minikube/releases/$MinikubeVersion/minikube-linux-amd64"
+Invoke-Executable { chmod +x minikube }
+Invoke-Executable { sudo mv minikube /usr/local/bin/ }
+Invoke-Executable { sudo minikube start --vm-driver=none --kubernetes-version=$KubernetesVersion }
 
 # Fix the kubectl context, as it's often stale.
-minikube update-context
+Invoke-Executable { minikube update-context }
 
 # Little helper to poll a command until the resource status reports a {Type: Ready, Status: True} condition
 function Wait-KubeConditions([scriptblock] $Command, [string]$Label) {
