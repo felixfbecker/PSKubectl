@@ -20,7 +20,7 @@ env:
     - DOTNET_SKIP_FIRST_TIME_EXPERIENCE=true
 
 before_script:
-  - ./ci/install-minikube.sh
+  - pwsh-preview ./ci/Install-Minikube.ps1 -KubectlVersion v1.9.0 -MinikubeVersion v0.25.2 -KubernetesVersion v1.9.0
 
 script:
   - pwsh-preview -c 'Install-Module -Force -Scope CurrentUser PSScriptAnalyzer'
