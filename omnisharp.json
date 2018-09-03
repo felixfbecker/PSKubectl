@@ -10,6 +10,9 @@
     "NewLinesForBracesInAccessors": false,
 		"NewLineForElse": false,
 		"NewLineForCatch": false,
-		"NewLineForFinally": false
+		"NewLineForFinally": false,
+    "NewLineForMembersInObjectInit": false,
+    "NewLineForMembersInAnonymousTypes": false,
+    "NewLinesForBracesInObjectCollectionArrayInitializers": false
 	}
 }
