@@ -58,9 +58,10 @@
 
     # Script files (.ps1) that are run in the caller's environment prior to importing this module.
     ScriptsToProcess = @(
+        'Completers/Get-KubeDeployment.Completer.ps1',
         'Completers/Get-KubeResource.Completer.ps1',
-        'Completers/Get-KubePod.Completer.ps1',
-        'Completers/Get-KubeDeployment.Completer.ps1'
+        'Completers/Namespace.Completer.ps1',
+        'Completers/PodName.Completer.ps1'
     )
 
     # Type files (.ps1xml) to be loaded when importing this module
@@ -77,6 +78,7 @@
         'Formats/Config.Format.ps1xml',
         'Formats/DeploymentV1.Format.ps1xml',
         'Formats/JsonPatch.Operations.Operation.Format.ps1xml',
+        'Formats/NamespaceV1.Format.ps1xml',
         'Formats/PodV1.Format.ps1xml'
     )
 
@@ -93,6 +95,7 @@
         'Get-KubeConfig',
         'Get-KubeDeployment',
         'Get-KubeLog',
+        'Get-KubeNamespace',
         'Get-KubePod',
         'Get-KubeResource',
         'Get-KubeResourceKinds',
