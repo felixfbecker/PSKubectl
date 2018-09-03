@@ -34,8 +34,17 @@ notifications:
 
 if: tag IS blank
 
-deploy:
-  provider: script
-  script: nvm install 10 && nvm use 10 && npm ci && ./node_modules/.bin/semantic-release
-  on:
-    branch: master
+jobs:
+  include:
+    - stage: release
+      language: node_js
+      node_js: '10'
+      install:
+        - npm ci
+      script:
+        - ./node_modules/.bin/semantic-release
+
+stages:
+  - test
+  - name: release
+    if: branch = master AND type = push AND fork = false
