@@ -29,10 +29,5 @@ script:
   - pwsh-preview ./ci/Invoke-Tests.ps1
   - bash <(curl -s https://codecov.io/bash) -f opencovercoverage.xml
 
-branches:
-  only:
-    - master
-    - /^renovate\//
-
 notifications:
   email: false
