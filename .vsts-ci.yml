@@ -17,6 +17,7 @@ phases:
     parameters:
       name: test_linux
       queue: 'Hosted Linux Preview'
+      installMiniKube: .vsts/install-minikube-linux.ps1
   - template: .vsts/template.yml
     parameters:
       name: test_macos
