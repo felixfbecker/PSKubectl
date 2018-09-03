@@ -11,7 +11,7 @@ phases:
   - phase: test_linux
     queue: 'Hosted Linux Preview'
     steps:
-      - powershell: ./ci/Install-Minikube.ps1
+      - powershell: ./ci/Install-Minikube.ps1 -KubectlVersion v1.9.0 -MinikubeVersion v0.25.2 -KubernetesVersion v1.9.0
         displayName: Install Minikube
       - task: DotNetCoreInstaller@0
         inputs:
