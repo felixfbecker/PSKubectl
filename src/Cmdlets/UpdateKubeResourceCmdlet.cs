@@ -14,7 +14,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Newtonsoft.Json.Serialization;
 
-namespace Kubectl {
+namespace Kubectl.Cmdlets {
     [Cmdlet(VerbsData.Update, "KubeResource", SupportsShouldProcess = true, DefaultParameterSetName = "Path")]
     [OutputType(new[] { typeof(KubeResourceV1) })]
     public sealed class UpdateKubeResourceCmdlet : KubeApiCmdlet {
@@ -87,8 +87,7 @@ namespace Kubectl {
             var comparer = new KubeResourceComparer(LoggerFactory);
             comparer.CreateThreeWayPatchFromLastApplied(current, modified, type, patch, true);
 
-            WriteVerbose("Patch: " + JsonConvert.SerializeObject(patch, new JsonSerializerSettings
-            {
+            WriteVerbose("Patch: " + JsonConvert.SerializeObject(patch, new JsonSerializerSettings {
                 Formatting = Formatting.Indented,
                 Converters = new[] { new PSObjectJsonConverter() }
             }));

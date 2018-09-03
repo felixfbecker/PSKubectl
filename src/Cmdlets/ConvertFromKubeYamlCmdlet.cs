@@ -14,7 +14,7 @@ using System.Linq;
 using System.Collections;
 using System.Reflection;
 
-namespace Kubectl {
+namespace Kubectl.Cmdlets {
     [Cmdlet(VerbsData.ConvertFrom, "KubeYaml")]
     [OutputType(new[] { typeof(KubeResourceV1) })]
     public class ConvertFromKubeYamlCmdlet : KubeCmdlet {

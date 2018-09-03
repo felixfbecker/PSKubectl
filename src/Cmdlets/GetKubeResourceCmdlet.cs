@@ -9,7 +9,7 @@ using KubeClient.Models;
 using KubeClient.ResourceClients;
 using Microsoft.Extensions.Logging;
 
-namespace Kubectl {
+namespace Kubectl.Cmdlets {
     [Cmdlet(VerbsCommon.Get, "KubeResource")]
     [OutputType(new[] { typeof(KubeResourceV1) })]
     public sealed class GetKubeResourceCmdlet : KubeApiCmdlet {

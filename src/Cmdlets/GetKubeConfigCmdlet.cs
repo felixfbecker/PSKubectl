@@ -8,7 +8,7 @@ using KubeClient.Models;
 using KubeClient.ResourceClients;
 using Microsoft.Extensions.Logging;
 
-namespace Kubectl {
+namespace Kubectl.Cmdlets {
     [Cmdlet(VerbsCommon.Get, "KubeConfig")]
     [OutputType(new[] { typeof(K8sConfig) })]
     public sealed class GetKubeConfigCmdlet : AsyncCmdlet {

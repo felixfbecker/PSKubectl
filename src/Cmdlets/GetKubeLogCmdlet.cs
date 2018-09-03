@@ -10,7 +10,7 @@ using Microsoft.Extensions.Logging;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Kubectl {
+namespace Kubectl.Cmdlets {
     [Cmdlet(VerbsCommon.Get, "KubeLog")]
     [OutputType(new[] { typeof(string) })]
     public class GetKubeLogCmdlet : KubeApiCmdlet {

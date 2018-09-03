@@ -8,7 +8,7 @@ using YamlDotNet.Serialization;
 using System.IO;
 using System.Runtime.InteropServices;
 
-namespace Kubectl {
+namespace Kubectl.Cmdlets {
     [Cmdlet(VerbsOther.Use, "KubeContext")]
     [OutputType(new[] { typeof(K8sConfig) })]
     public sealed class UseKubeContextCmdlet : AsyncCmdlet {

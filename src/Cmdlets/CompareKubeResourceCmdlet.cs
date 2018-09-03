@@ -15,7 +15,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Newtonsoft.Json.Serialization;
 
-namespace Kubectl {
+namespace Kubectl.Cmdlets {
     [Cmdlet(VerbsData.Compare, "KubeResource")]
     [OutputType(new[] { typeof(Operation) })]
     public sealed class CompareKubeResourceCmdlet : KubeCmdlet {

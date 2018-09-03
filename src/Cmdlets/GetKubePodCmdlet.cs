@@ -9,10 +9,10 @@ using KubeClient.Models;
 using KubeClient.ResourceClients;
 using Microsoft.Extensions.Logging;
 
-namespace Kubectl {
-    [Cmdlet(VerbsCommon.Get, "KubeDeployment")]
-    [OutputType(new[] { typeof(DeploymentV1) })]
-    public sealed class GetKubeDeploymentCmdlet : KubeApiCmdlet {
+namespace Kubectl.Cmdlets {
+    [Cmdlet(VerbsCommon.Get, "KubePod")]
+    [OutputType(new[] { typeof(PodV1) })]
+    public sealed class GetKubePodCmdlet : KubeApiCmdlet {
         [Parameter(ValueFromPipelineByPropertyName = true)]
         public string Namespace { get; set; }
 
@@ -25,26 +25,26 @@ namespace Kubectl {
 
         protected override async Task ProcessRecordAsync(CancellationToken cancellationToken) {
             await base.ProcessRecordAsync(cancellationToken);
-            IEnumerable<DeploymentV1> deploymentList;
+            IEnumerable<PodV1> podList;
             if (String.IsNullOrEmpty(Name) || WildcardPattern.ContainsWildcardCharacters(Name)) {
-                deploymentList = await client.DeploymentsV1().List(
+                podList = await client.PodsV1().List(
                     kubeNamespace: Namespace,
                     labelSelector: LabelSelector,
                     cancellationToken: cancellationToken
                 );
             } else {
-                DeploymentV1 deployment = await client.DeploymentsV1().Get(
+                PodV1 pod = await client.PodsV1().Get(
                     name: Name,
                     kubeNamespace: Namespace,
                     cancellationToken: cancellationToken
                 );
-                deploymentList = new[] { deployment };
+                podList = new[] { pod };
             }
             if (WildcardPattern.ContainsWildcardCharacters(Name)) {
                 var pattern = new WildcardPattern(Name);
-                deploymentList = deploymentList.Where(deployment => pattern.IsMatch(deployment.Metadata.Name));
+                podList = podList.Where(pod => pattern.IsMatch(pod.Metadata.Name));
             }
-            WriteObject(deploymentList, true);
+            WriteObject(podList, true);
         }
     }
 }
