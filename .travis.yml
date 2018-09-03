@@ -1,8 +1,18 @@
 sudo: required
 
+dist: trusty
+addons:
+  apt:
+    sources:
+      - sourceline: deb [arch=amd64] https://packages.microsoft.com/ubuntu/14.04/prod trusty main
+        key_url: https://packages.microsoft.com/keys/microsoft.asc
+    packages:
+      - powershell-preview
+
 # This moves Kubernetes specific config files.
 env:
-  - CHANGE_MINIKUBE_NONE_USER=true
+  global:
+    - CHANGE_MINIKUBE_NONE_USER=true
 
 before_script:
   # Download kubectl, which is a requirement for using minikube.
