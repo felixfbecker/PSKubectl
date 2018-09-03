@@ -2,16 +2,16 @@ verifyConditions:
   - '@semantic-release/github'
 prepare:
   - path: '@semantic-release/exec'
-    cmd: pwsh build.ps1 -Configuration Release
+    cmd: pwsh-preview build.ps1 -Configuration Release
   - path: '@semantic-release/exec'
-    shell: pwsh
+    shell: pwsh-preview
     cmd: |
       Update-ModuleManifest -ErrorAction Stop -Path ./PSKubectl/PSKubectl.psd1 -ModuleVersion '${nextRelease.version}' -ReleaseNotes @'
       ${nextRelease.notes}
       '@.Trim()
 publish:
   - path: '@semantic-release/exec'
-    shell: pwsh
+    shell: pwsh-preview
     cmd: |
       & {
         $ErrorActionPreference = 'Stop'

@@ -3,6 +3,14 @@
 /logs/
 /node_modules/
 
+clover.xml
+coverage-hits.txt
+coverage-html
+coverage.hits
+coverage.json
+coverage.xml
+opencovercoverage.xml
+
 # Autosave files
 *~
 

@@ -1,0 +1,41 @@
+language: csharp
+dotnet: '2.1.400'
+mono: none
+
+sudo: required
+
+dist: trusty
+addons:
+  apt:
+    sources:
+      - sourceline: deb [arch=amd64] https://packages.microsoft.com/ubuntu/14.04/prod trusty main
+        key_url: https://packages.microsoft.com/keys/microsoft.asc
+    packages:
+      - powershell-preview
+
+env:
+  global:
+    # This moves Kubernetes specific config files.
+    - CHANGE_MINIKUBE_NONE_USER=true
+    - DOTNET_SKIP_FIRST_TIME_EXPERIENCE=true
+
+install:
+  - pwsh-preview ./ci/Install-Minikube.ps1 -KubectlVersion v1.9.0 -MinikubeVersion v0.25.2 -KubernetesVersion v1.9.0
+  - pwsh-preview -c 'Install-Module -Force -Scope CurrentUser PSScriptAnalyzer'
+
+script:
+  - pwsh-preview -c 'Invoke-ScriptAnalyzer -Path . -Recurse -Settings PSScriptAnalyzerSettings.psd1 | Format-List -Property RuleName,Message,ScriptPath,Line,Column'
+  - pwsh-preview ./build.ps1
+  - pwsh-preview ./ci/Invoke-Tests.ps1
+  - bash <(curl -s https://codecov.io/bash) -f opencovercoverage.xml
+
+notifications:
+  email: false
+
+if: tag IS blank
+
+deploy:
+  provider: script
+  script: nvm install 10 && nvm use 10 && npm ci && ./node_modules/.bin/semantic-release
+  on:
+    branch: master

@@ -1,9 +1,4 @@
 name: $(BuildID)
-trigger:
-  branches:
-    include:
-      - master
-      - renovate/*
 
 phases:
   - phase: lint
@@ -13,10 +8,21 @@ phases:
           Install-Module -Force -Scope CurrentUser PSScriptAnalyzer
           Invoke-ScriptAnalyzer -Path . -Recurse -Settings PSScriptAnalyzerSettings.psd1 | Format-List -Property RuleName,Message,ScriptPath,Line,Column
         displayName: Run PSScriptAnalyzer
-  - template: .vsts/template.yml
-    parameters:
-      name: test_linux
-      queue: 'Hosted Linux Preview'
+  - phase: test_linux
+    queue: 'Hosted Linux Preview'
+    steps:
+      - powershell: ./ci/Install-Minikube.ps1 -KubectlVersion v1.9.0 -MinikubeVersion v0.25.2 -KubernetesVersion v1.9.0
+        displayName: Install Minikube
+      - task: DotNetCoreInstaller@0
+        inputs:
+          version: '2.1.400'
+        displayName: 'Install .NET Core SDK'
+      - powershell: ./build.ps1
+        env:
+          DOTNET_SKIP_FIRST_TIME_EXPERIENCE: 'true'
+        displayName: Build assemblies
+      - powershell: ./ci/Invoke-Tests.ps1
+        displayName: Run tests
   - template: .vsts/template.yml
     parameters:
       name: test_macos

@@ -2,7 +2,7 @@
 
 [![powershellgallery](https://img.shields.io/powershellgallery/v/PSKubectl.svg)](https://www.powershellgallery.com/packages/PSKubectl)
 [![downloads](https://img.shields.io/powershellgallery/dt/PSKubectl.svg?label=downloads)](https://www.powershellgallery.com/packages/PSKubectl)
-[![builds](https://img.shields.io/vso/build/felixfbecker/ac9f86f8-64e9-4d02-934f-f0725c27e283/3.svg)](https://felixfbecker.visualstudio.com/PSKubectl/_build/latest?definitionId=3&branch=master)
+[![build](https://img.shields.io/travis/felixfbecker/PSKubectl/master.svg)](https://travis-ci.org/felixfbecker/PSKubectl)
 ![powershell: >=6.1.0-preview.3](https://img.shields.io/badge/powershell-%3E%3D6.1.0--preview.3-orange.svg)
 [![codecov](https://codecov.io/gh/felixfbecker/PSKubectl/branch/master/graph/badge.svg)](https://codecov.io/gh/felixfbecker/PSKubectl)
 
@@ -108,3 +108,9 @@ A convenience cmdlet to update the current context. Supports tab-completion for 
 Run `./build.ps1` to build.
 
 `./load.ps1` will build and load the module into a new shell. Run `exit` and rerun `./load.ps1` to reload the module.
+
+### Tests
+
+Tests are written in PowerShell with Pester and run against an actual test Kubernetes cluster, such as Minikube or Docker for Desktop.
+If you want to run them locally, make sure to set your kubectl context to a throw-away cluster, and set `$PSBoundParameterValues['*-Kube*:ApiEndPoint']` to point to that cluster.
+Then execute `Invoke-Pester ./Tests` to run the tests.
