@@ -11,4 +11,6 @@ phases:
           version: '2.1.400'
         displayName: 'Install .NET Core SDK'
       - powershell: ./build.ps1
+        env:
+          DOTNET_SKIP_FIRST_TIME_EXPERIENCE: 'true'
         displayName: Build assemblies
