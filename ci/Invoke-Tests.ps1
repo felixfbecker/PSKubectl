@@ -4,10 +4,10 @@ $ProgressPreference = 'SilentlyContinue'
 
 Install-Module -Scope CurrentUser -Force Pester
 
-Import-Module "$PSScriptRoot/Tests/Invoke-Executable.psm1"
+Import-Module "$PSScriptRoot/../Tests/Invoke-Executable.psm1"
 
 # Need to switch to src/ so dotnet CLI finds the minicover tool
-Push-Location "$PSScriptRoot/src"
+Push-Location "$PSScriptRoot/../src"
 try {
     # Instrument assemblies for code coverage prior to importing
     Invoke-Executable { dotnet minicover instrument --workdir ../ --assemblies ./PSKubectl/Assemblies/PSKubectl.dll --sources './src/**/*.cs' }
