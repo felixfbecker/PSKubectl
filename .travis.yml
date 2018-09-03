@@ -25,6 +25,7 @@ before_script:
 script:
   - pwsh-preview ./build.ps1
   - pwsh-preview ./ci/Invoke-Tests.ps1
+  - bash <(curl -s https://codecov.io/bash) -f opencovercoverage.xml
 
 branches:
   only:
