@@ -14,7 +14,7 @@ namespace Kubectl {
     [Cmdlet(VerbsCommon.Get, "KubeLog")]
     [OutputType(new[] { typeof(string) })]
     public class GetKubeLogCmdlet : KubeApiCmdlet {
-        [Parameter()]
+        [Parameter(ValueFromPipelineByPropertyName = true)]
         public string Namespace { get; set; }
 
         [Parameter(Position = 0, Mandatory = true, ValueFromPipeline = true, ValueFromPipelineByPropertyName = true)]
