@@ -11,7 +11,7 @@ phases:
   - phase: test_linux
     queue: 'Hosted Linux Preview'
     steps:
-      - bash: ./ci/install-minikube.sh
+      - powershell: ./ci/Install-Minikube.ps1
         displayName: Install Minikube
       - task: DotNetCoreInstaller@0
         inputs:
