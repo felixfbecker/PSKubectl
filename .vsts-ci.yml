@@ -1,9 +1,4 @@
 name: $(BuildID)
-trigger:
-  branches:
-    include:
-      - master
-      - renovate/*
 
 phases:
   - phase: lint
