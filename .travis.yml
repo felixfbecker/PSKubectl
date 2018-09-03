@@ -19,11 +19,11 @@ env:
     - CHANGE_MINIKUBE_NONE_USER=true
     - DOTNET_SKIP_FIRST_TIME_EXPERIENCE=true
 
-before_script:
+install:
   - pwsh-preview ./ci/Install-Minikube.ps1 -KubectlVersion v1.9.0 -MinikubeVersion v0.25.2 -KubernetesVersion v1.9.0
+  - pwsh-preview -c 'Install-Module -Force -Scope CurrentUser PSScriptAnalyzer'
 
 script:
-  - pwsh-preview -c 'Install-Module -Force -Scope CurrentUser PSScriptAnalyzer'
   - pwsh-preview -c 'Invoke-ScriptAnalyzer -Path . -Recurse -Settings PSScriptAnalyzerSettings.psd1 | Format-List -Property RuleName,Message,ScriptPath,Line,Column'
   - pwsh-preview ./build.ps1
   - pwsh-preview ./ci/Invoke-Tests.ps1
@@ -31,3 +31,9 @@ script:
 
 notifications:
   email: false
+
+deploy:
+  provider: script
+  script: nvm install 10 && nvm use 10 && npm ci && ./node_modules/.bin/semantic-release
+  on:
+    branch: master
