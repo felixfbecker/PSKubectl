@@ -77,7 +77,6 @@
                                             $container = $pod.Status.ContainerStatuses[$i]
                                             $restarts += $container.RestartCount
                                             if ($container.State.Waiting -and $container.State.Waiting.Reason) {
-                                                Write-Information "here"
                                                 $reason = $container.State.Waiting.Reason
                                             } elseif ($container.State.Terminated -and $container.State.Terminated.Reason) {
                                                 $reason = $container.State.Terminated.Reason
