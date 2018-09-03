@@ -67,15 +67,16 @@
     TypesToProcess   = @(
         'Types/Config.Types.ps1xml',
         'Types/Context.Types.ps1xml',
-        'Types/DeploymentV1Beta1.Types.ps1xml',
-        'Types/PodV1.Types.ps1xml'
+        'Types/DeploymentV1.Types.ps1xml',
+        'Types/PodV1.Types.ps1xml',
+        'Types/ResourceV1.Types.ps1xml'
     )
 
     # Format files (.ps1xml) to be loaded when importing this module
     FormatsToProcess = @(
         'Formats/Config.Format.ps1xml',
+        'Formats/DeploymentV1.Format.ps1xml',
         'Formats/JsonPatch.Operations.Operation.Format.ps1xml',
-        'Formats/DeploymentV1Beta1.Format.ps1xml',
         'Formats/PodV1.Format.ps1xml'
     )
 

@@ -1,12 +1,8 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <Types>
     <Type>
-        <Name>KubeClient.Models.DeploymentV1Beta1</Name>
+        <Name>KubeClient.Models.DeploymentV1</Name>
         <Members>
-            <ScriptProperty>
-                <Name>Name</Name>
-                <GetScriptBlock>$this.Metadata.Name</GetScriptBlock>
-            </ScriptProperty>
             <ScriptProperty>
                 <Name>Namespace</Name>
                 <GetScriptBlock>$this.Metadata.Namespace</GetScriptBlock>
@@ -26,10 +22,6 @@
             <ScriptProperty>
                 <Name>Available</Name>
                 <GetScriptBlock>$this.Status.AvailableReplicas</GetScriptBlock>
-            </ScriptProperty>
-            <ScriptProperty>
-                <Name>Age</Name>
-                <GetScriptBlock>New-TimeSpan -Start $this.Metadata.CreationTimestamp -End (Get-Date)</GetScriptBlock>
             </ScriptProperty>
         </Members>
     </Type>

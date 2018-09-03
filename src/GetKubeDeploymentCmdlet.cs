@@ -11,7 +11,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Kubectl {
     [Cmdlet(VerbsCommon.Get, "KubeDeployment")]
-    [OutputType(new[] { typeof(DeploymentV1Beta1) })]
+    [OutputType(new[] { typeof(DeploymentV1) })]
     public sealed class GetKubeDeploymentCmdlet : KubeApiCmdlet {
         [Parameter(ValueFromPipelineByPropertyName = true)]
         public string Namespace { get; set; }
@@ -25,15 +25,15 @@ namespace Kubectl {
 
         protected override async Task ProcessRecordAsync(CancellationToken cancellationToken) {
             await base.ProcessRecordAsync(cancellationToken);
-            IEnumerable<DeploymentV1Beta1> deploymentList;
+            IEnumerable<DeploymentV1> deploymentList;
             if (String.IsNullOrEmpty(Name) || WildcardPattern.ContainsWildcardCharacters(Name)) {
-                deploymentList = await client.DeploymentsV1Beta1().List(
+                deploymentList = await client.DeploymentsV1().List(
                     kubeNamespace: Namespace,
                     labelSelector: LabelSelector,
                     cancellationToken: cancellationToken
                 );
             } else {
-                DeploymentV1Beta1 deployment = await client.DeploymentsV1Beta1().Get(
+                DeploymentV1 deployment = await client.DeploymentsV1().Get(
                     name: Name,
                     kubeNamespace: Namespace,
                     cancellationToken: cancellationToken

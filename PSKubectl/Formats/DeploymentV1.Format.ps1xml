@@ -5,7 +5,7 @@
             <!-- Resembles the default output of kubectl get deploy -->
             <Name>Default</Name>
             <ViewSelectedBy>
-                <TypeName>KubeClient.Models.DeploymentV1Beta1</TypeName>
+                <TypeName>KubeClient.Models.DeploymentV1</TypeName>
             </ViewSelectedBy>
             <TableControl>
                 <TableHeaders>

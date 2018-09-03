@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Types>
+    <Type>
+        <Name>KubeClient.Models.KubeResourceV1</Name>
+        <Members>
+            <ScriptProperty>
+                <Name>Name</Name>
+                <GetScriptBlock>$this.Metadata.Name</GetScriptBlock>
+            </ScriptProperty>
+            <ScriptProperty>
+                <Name>Namespace</Name>
+                <GetScriptBlock>$this.Metadata.Namespace</GetScriptBlock>
+            </ScriptProperty>
+            <ScriptProperty>
+                <Name>Age</Name>
+                <GetScriptBlock>New-TimeSpan -Start $this.Metadata.CreationTimestamp -End (Get-Date)</GetScriptBlock>
+            </ScriptProperty>
+        </Members>
+    </Type>
+</Types>
