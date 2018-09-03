@@ -9,7 +9,9 @@ phases:
   - phase: lint
     queue: 'Hosted Linux Preview'
     steps:
-      - powershell: Invoke-ScriptAnalyzer -Path . -Recurse -Settings PSScriptAnalyzerSettings.psd1
+      - powershell: |
+          Install-Module -Force -Scope CurrentUser PSScriptAnalyzer
+          Invoke-ScriptAnalyzer -Path . -Recurse -Settings PSScriptAnalyzerSettings.psd1 | Format-List -Property RuleName,Message,ScriptPath,Line,Column
         displayName: Run PSScriptAnalyzer
   - template: .vsts/template.yml
     parameters:
