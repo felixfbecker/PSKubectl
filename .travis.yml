@@ -32,6 +32,8 @@ script:
 notifications:
   email: false
 
+if: tag IS blank
+
 deploy:
   provider: script
   script: nvm install 10 && nvm use 10 && npm ci && ./node_modules/.bin/semantic-release
