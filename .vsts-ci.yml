@@ -31,7 +31,6 @@ phases:
           versionSpec: ^10.3.0
       - bash: npm ci && ./node_modules/.bin/semantic-release
         env:
-          CI: 'true'
           NUGET_API_KEY: $(NuGetApiKey)
           GITHUB_TOKEN: $(GitHubToken)
         displayName: Run semantic-release
