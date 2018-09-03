@@ -2,7 +2,8 @@
 
 [![powershellgallery](https://img.shields.io/powershellgallery/v/PSKubectl.svg)](https://www.powershellgallery.com/packages/PSKubectl)
 [![downloads](https://img.shields.io/powershellgallery/dt/PSKubectl.svg?label=downloads)](https://www.powershellgallery.com/packages/PSKubectl)
-[![builds](https://img.shields.io/vso/build/felixfbecker/ac9f86f8-64e9-4d02-934f-f0725c27e283/3.svg)](https://felixfbecker.visualstudio.com/PSKubectl/_build/latest?definitionId=3&branch=master)
+[![vsts build](https://img.shields.io/vso/build/felixfbecker/ac9f86f8-64e9-4d02-934f-f0725c27e283/3.svg?logo=tfs)](https://felixfbecker.visualstudio.com/PSKubectl/_build/latest?definitionId=3&branch=master)
+[![travis build](https://img.shields.io/travis/felixfbecker/PSKubectl/master.svg?logo=travis)](https://travis-ci.org/felixfbecker/PSKubectl)
 ![powershell: >=6.1.0-preview.3](https://img.shields.io/badge/powershell-%3E%3D6.1.0--preview.3-orange.svg)
 [![codecov](https://codecov.io/gh/felixfbecker/PSKubectl/branch/master/graph/badge.svg)](https://codecov.io/gh/felixfbecker/PSKubectl)
 
