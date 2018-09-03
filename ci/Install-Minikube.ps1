@@ -4,6 +4,10 @@ param(
     [Parameter(Mandatory)][string]$KubernetesVersion
 )
 
+$ErrorActionPreference = 'Stop'
+$ProgressPreference = 'SilentlyContinue'
+$InformationPreference = 'Continue'
+
 Import-Module "$PSScriptRoot/../Tests/Invoke-Executable.psm1"
 
 $env:CHANGE_MINIKUBE_NONE_USER = 'true'
