@@ -1,5 +1,5 @@
 $ErrorActionPreference = 'Stop'
-$InformationPreference = 'SilentlyContinue' # With Continue, output spits out broken CLIXML
+$InformationPreference = 'Continue'
 $ProgressPreference = 'SilentlyContinue'
 
 Install-Module -Scope CurrentUser -Force Pester
