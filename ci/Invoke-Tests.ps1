@@ -29,7 +29,7 @@ try {
     }
 
     # Output coverage reports
-    Invoke-Executable { dotnet minicover report --workdir ../ }
+    Invoke-Executable { dotnet minicover report --workdir ../ --threshold 0 }
     Invoke-Executable { dotnet minicover opencoverreport --workdir ../ }
 } finally {
     Pop-Location
