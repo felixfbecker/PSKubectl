@@ -13,9 +13,9 @@ addons:
     packages:
       - powershell-preview
 
-# This moves Kubernetes specific config files.
 env:
   global:
+    # This moves Kubernetes specific config files.
     - CHANGE_MINIKUBE_NONE_USER=true
     - DOTNET_SKIP_FIRST_TIME_EXPERIENCE=true
 
@@ -23,6 +23,8 @@ before_script:
   - ./ci/install-minikube.sh
 
 script:
+  - pwsh-preview -c 'Install-Module -Force -Scope CurrentUser PSScriptAnalyzer'
+  - pwsh-preview -c 'Invoke-ScriptAnalyzer -Path . -Recurse -Settings PSScriptAnalyzerSettings.psd1 | Format-List -Property RuleName,Message,ScriptPath,Line,Column'
   - pwsh-preview ./build.ps1
   - pwsh-preview ./ci/Invoke-Tests.ps1
   - bash <(curl -s https://codecov.io/bash) -f opencovercoverage.xml
