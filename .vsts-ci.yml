@@ -6,6 +6,11 @@ trigger:
       - renovate/*
 
 phases:
+  - phase: lint
+    queue: 'Hosted Linux Preview'
+    steps:
+      - powershell: Invoke-ScriptAnalyzer -Path . -Recurse -Settings PSScriptAnalyzerSettings.psd1
+        displayName: Run PSScriptAnalyzer
   - template: .vsts/template.yml
     parameters:
       name: test_linux
@@ -22,6 +27,7 @@ phases:
     queue: 'Hosted Linux Preview'
     condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
     dependsOn:
+      - lint
       - test_linux
       - test_macos
       - test_windows
