@@ -15,6 +15,7 @@ sudo minikube start --vm-driver=none --kubernetes-version=v1.9.0
 minikube update-context
 
 # Wait for Kubernetes to be up and ready.
+$timer = [Diagnostics.Stopwatch]::StartNew()
 while ($true) {
     Write-Information "Waiting for node to be ready"
     $nodes = (Invoke-Executable { kubectl get nodes -o json } | ConvertFrom-Json).Items
@@ -25,7 +26,11 @@ while ($true) {
         break
     }
     Start-Sleep 1
+    if ($timer.Elapsed.TotalSeconds -gt 60) {
+        throw "Timed out after 60s waiting for node to become ready"
+    }
 }
+$timer.Stop()
 
 Write-Information "Node ready"
 
