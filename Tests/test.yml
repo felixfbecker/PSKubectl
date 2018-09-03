@@ -1,0 +1,29 @@
+##################################################
+# Kubernetes resources to be created for testing #
+##################################################
+
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: pskubectltest
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: hello-world
+  namespace: pskubectltest
+spec:
+  selector:
+    matchLabels:
+      app: hello-world
+  replicas: 2
+  template:
+    metadata:
+      labels:
+        app: hello-world
+    spec:
+      containers:
+        - name: hello-world
+          image: strm/helloworld-http:latest
+          ports:
+            - containerPort: 80

@@ -108,3 +108,8 @@ A convenience cmdlet to update the current context. Supports tab-completion for 
 Run `./build.ps1` to build.
 
 `./load.ps1` will build and load the module into a new shell. Run `exit` and rerun `./load.ps1` to reload the module.
+
+### Tests
+
+Tests are written in PowerShell with Pester and run against an actual test Kubernetes cluster, such as Minikube or Docker for Desktop.
+If you want to run them locally, make sure to set your kubectl context to a clean throw-away cluster, and set `$PSBoundParameterValues['*-Kube*:ApiEndPoint']` to point to that cluster.

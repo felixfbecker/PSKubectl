@@ -43,4 +43,4 @@ script:
   - JSONPATH='{range .items[*]}{@.metadata.name}:{range @.status.conditions[*]}{@.type}={@.status};{end}{end}'; until kubectl -n default get pods -lapp=travis-example -o jsonpath="$JSONPATH" 2>&1 | grep -q "Ready=True"; do sleep 1;echo "waiting for travis-example deployment to be available"; kubectl get pods -n default; done
   # Build
   - pwsh-preview ./build.ps1
-  # - pwsh-preview ./ci/Invoke-Tests.ps1
+  - pwsh-preview ./ci/Invoke-Tests.ps1
