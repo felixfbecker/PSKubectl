@@ -8,7 +8,23 @@ Describe Get-KubePod {
 
     It 'Should return the pods that exist in a namespace' {
         $pods = Get-KubePod -Namespace pskubectltest
-        $pods.Count | Should -Be 2
+        $pods.Count | Should -Not -BeNullOrEmpty
+        $pods | ForEach-Object {
+            $_ | Should -BeOfType KubeClient.Models.PodV1
+            $_.Name | Should -BeLike 'hello-world-*'
+            $_.Namespace | Should -Be 'pskubectltest'
+            $_.Status.Phase | Should -Be 'Running'
+        }
+    }
+}
+
+Describe Get-KubeResource {
+
+    BeforeAll { Initialize-TestNamespace }
+
+    It 'Should return pods in a namespace' {
+        $pods = Get-KubeResource Pod -Namespace pskubectltest
+        $pods.Count | Should -Not -BeNullOrEmpty
         $pods | ForEach-Object {
             $_ | Should -BeOfType KubeClient.Models.PodV1
             $_.Name | Should -BeLike 'hello-world-*'
@@ -46,33 +62,6 @@ Describe Get-KubeNamespace {
 }
 
 Describe Update-KubeResource {
-
-    BeforeAll { Initialize-TestNamespace }
-
-    It 'Should update the resource from pipeline input' {
-        $before = (Invoke-Executable { kubectl get deploy -n pskubectltest -o json } | ConvertFrom-Json).Items
-        $modified = [pscustomobject]@{
-            Kind = 'Deployment'
-            ApiVersion = 'v1'
-            Metadata = [pscustomobject]@{
-                Name = 'hello-world'
-                Namespace = 'pskubectltest'
-            }
-            Spec = [pscustomobject]@{
-                Replicas = 3 # increase replicas by 1
-            }
-        }
-        $result = $modified | Update-KubeResource
-        $result | Should -Not -BeNullOrEmpty
-        $result | Should -BeOfType KubeClient.Models.DeploymentV1
-        $result.Spec.Replicas | Should -Be 3
-        $after = (Invoke-Executable { kubectl get deploy -n pskubectltest -o json } | ConvertFrom-Json).Items
-        $after.Spec.Replicas | Should -Be 3
-        $after.Metadata.Annotations.'kubectl.kubernetes.io/last-applied-configuration' | Should -Not -Be $before.Metadata.Annotations.'kubectl.kubernetes.io/last-applied-configuration'
-    }
-}
-
-Describe Compare-KubeResource {
 
     BeforeAll { Initialize-TestNamespace }
 
