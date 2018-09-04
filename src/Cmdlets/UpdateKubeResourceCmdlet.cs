@@ -15,16 +15,16 @@ using Newtonsoft.Json.Linq;
 using Newtonsoft.Json.Serialization;
 
 namespace Kubectl.Cmdlets {
-    [Cmdlet(VerbsData.Update, "KubeResource", SupportsShouldProcess = true, DefaultParameterSetName = "Path")]
+    [Cmdlet(VerbsData.Update, "KubeResource", SupportsShouldProcess = true)]
     [OutputType(new[] { typeof(KubeResourceV1) })]
     public sealed class UpdateKubeResourceCmdlet : KubeApiCmdlet {
-        [Parameter(Mandatory = true, Position = 0, ParameterSetName = "Path", ValueFromPipeline = true, ValueFromPipelineByPropertyName = true)]
+        [Parameter(Mandatory = true, Position = 0, ParameterSetName = "Path", ValueFromPipelineByPropertyName = true)]
         [Alias("FullName")]
         [ValidateNotNullOrEmpty()]
         [SupportsWildcards()]
         public string Path { get; set; }
 
-        [Parameter(Mandatory = true, Position = 0, ValueFromPipeline = true, ParameterSetName = "Object")]
+        [Parameter(Mandatory = true, ValueFromPipeline = true, ParameterSetName = "Object")]
         [ValidateNotNull()]
         public object Resource { get; set; }
 
@@ -71,6 +71,9 @@ namespace Kubectl.Cmdlets {
 
             dynamic metadata = modified.Metadata;
             string name = (string)metadata.Name;
+            if (String.IsNullOrEmpty(name)) {
+                throw new Exception("Input object does not have Metadata.Name set");
+            }
             string kubeNamespace = (string)metadata.Namespace;
 
             // Get current resource state from server

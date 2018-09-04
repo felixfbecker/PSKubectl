@@ -19,8 +19,7 @@ using Newtonsoft.Json.Serialization;
 
 namespace Kubectl {
     public sealed class KubeResourceComparer {
-        private Dictionary<Type, HashSet<string>> nonUpdateableTypes = new Dictionary<Type, HashSet<string>>
-        {
+        private Dictionary<Type, HashSet<string>> nonUpdateableTypes = new Dictionary<Type, HashSet<string>> {
             [typeof(KubeObjectV1)] = new HashSet<string> {
                 "ApiVersion",
                 "Kind",
@@ -68,8 +67,14 @@ namespace Kubectl {
                 original = JsonConvert.DeserializeObject(originalJson, type);
             }
             if (annotate) {
-                var modifiedAnnotations = (IDictionary)modified.Metadata.Annotations;
-                modifiedAnnotations[Annotations.LastAppliedConfig] = JsonConvert.SerializeObject(modified, new PSObjectJsonConverter());
+                var modifiedJson = JsonConvert.SerializeObject(modified, new PSObjectJsonConverter());
+                if (modified.Metadata == null) {
+                    ((object)modified).SetDynamicPropertyValue("Metadata", new PSObject());
+                }
+                if (modified.Metadata.Annotations == null) {
+                    ((object)modified.Metadata).SetDynamicPropertyValue("Annotations", new Dictionary<string, string>());
+                }
+                modified.Metadata.Annotations[Annotations.LastAppliedConfig] = modifiedJson;
             }
             CreateThreeWayPatch(original, modified, current, type, patch);
         }
@@ -355,9 +360,9 @@ namespace Kubectl {
                 // https://github.com/kubernetes/community/blob/master/contributors/devel/api-conventions.md#metadata
                 // Add this test before traversing into other properties
                 if (type.IsSubclassOf(typeof(KubeResourceV1))) {
-                    var resourceVersion = (string)original.Metadata?.ResourceVersion;
+                    var resourceVersion = (string)original?.Metadata?.ResourceVersion;
                     if (!String.IsNullOrEmpty(resourceVersion)) {
-                        patch.Test(path + "/resourceVersion", resourceVersion);
+                        patch.Test(path + "/metadata/resourceVersion", resourceVersion);
                     }
                 }
                 // KubeObjects, compare properties recursively
