@@ -1,4 +1,4 @@
-# Kubectl for PowerShell <img src="https://raw.githubusercontent.com/kubernetes/kubernetes/master/logo/logo.svg?sanitize=true" height="90" align="left">
+# Kubectl for PowerShell <img src="https://raw.githubusercontent.com/kubernetes/kubernetes/5b355f5d408c80234b4016a84b4d7c8159db21d7/logo/logo.svg?sanitize=true" height="90" align="left">
 [![powershellgallery](https://img.shields.io/powershellgallery/v/PSKubectl.svg)](https://www.powershellgallery.com/packages/PSKubectl)
 [![downloads](https://img.shields.io/powershellgallery/dt/PSKubectl.svg?label=downloads)](https://www.powershellgallery.com/packages/PSKubectl)
 [![build](https://img.shields.io/travis/felixfbecker/PSKubectl/master.svg)](https://travis-ci.org/felixfbecker/PSKubectl)
