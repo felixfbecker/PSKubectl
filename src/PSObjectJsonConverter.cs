@@ -6,13 +6,8 @@ using Newtonsoft.Json.Linq;
 
 namespace Kubectl {
     /// <summary>JsonConverter that writes out PSObjects like normal objects</summary>
-    public class PSObjectJsonConverter : JsonConverter {
-        public override bool CanConvert(Type objectType) {
-            return typeof(PSObject).IsAssignableFrom(objectType);
-        }
-
-        public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer) {
-            var psObject = (PSObject)value;
+    public class PSObjectJsonConverter : JsonConverter<PSObject> {
+        public override void WriteJson(JsonWriter writer, PSObject psObject, JsonSerializer serializer) {
             writer.WriteStartObject();
             foreach (var prop in psObject.Properties) {
                 // Do not include ScriptProperties defined in Types.ps1xml files, only the members added by PSKubectl
@@ -26,7 +21,7 @@ namespace Kubectl {
             writer.WriteEndObject();
         }
 
-        public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer) {
+        public override PSObject ReadJson(JsonReader reader, Type objectType, PSObject existingValue, bool hasExistingValue, JsonSerializer serializer) {
             throw new NotImplementedException();
         }
 
