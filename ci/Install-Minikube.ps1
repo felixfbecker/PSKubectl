@@ -34,8 +34,7 @@ function Wait-KubeConditions([scriptblock] $Command, [string]$Label) {
             Write-Information "Waiting for $Label to be ready"
             $resources = (Invoke-Executable $Command | ConvertFrom-Json).Items
             $conditions = $resources.Status.Conditions
-            Write-Information "Conditions:"
-            $conditions
+            $conditions | Format-Table -Property Type, Status, Reason, Message
             if (($conditions | Where-Object { $_.Type -eq 'Ready' -and $_.Status -eq 'True' })) {
                 break
             }
