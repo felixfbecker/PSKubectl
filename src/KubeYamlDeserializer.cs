@@ -96,7 +96,9 @@ namespace Kubectl {
                 psObject.Properties.Add(new PSNoteProperty(prop.Name, toPSObject(entry.Value, prop.PropertyType)));
             }
             // Add type name for output formatting
-            psObject.TypeNames.Insert(0, type.FullName);
+            for (var t = type; t != null; t = t.BaseType) {
+                psObject.TypeNames.Insert(0, t.FullName);
+            }
             return psObject;
         }
     }
