@@ -39,14 +39,20 @@ namespace Kubectl {
             }
 
             if (obj is PSObject psObject) {
-                psObject.Properties.Add(new PSNoteProperty(propertyName, value));
-                return;
+                // Handle PSObject
+                if (psObject.Properties[propertyName] != null) {
+                    psObject.Properties[propertyName].Value = value;
+                } else {
+                    psObject.Properties.Add(new PSNoteProperty(propertyName, value));
+                }
+            } else {
+                // Handle plain .NET object
+                var prop = obj.GetType().GetProperty(propertyName);
+                if (prop == null) {
+                    throw new Exception($"Cannot set property value of unknown property {propertyName} on object of type {obj.GetType().Name}");
+                }
+                prop.SetValue(obj, value);
             }
-            var prop = obj.GetType().GetProperty(propertyName);
-            if (prop == null) {
-                throw new Exception($"Cannot set property value of unknown property {propertyName} on object of type {obj.GetType().Name}");
-            }
-            prop.SetValue(obj, value);
         }
     }
 }
