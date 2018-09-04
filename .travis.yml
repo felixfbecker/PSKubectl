@@ -39,9 +39,12 @@ jobs:
   include:
     - stage: test
     - stage: release
-      language: node_js
-      node_js: '10'
+      cache:
+        directories:
+          - ~/.npm
       install:
+        - nvm install 10
+        - nvm use 10
         - npm ci
       script:
         - ./node_modules/.bin/semantic-release
