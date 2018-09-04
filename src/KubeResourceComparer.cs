@@ -365,6 +365,10 @@ namespace Kubectl {
                         patch.Test(path + "/metadata/resourceVersion", resourceVersion);
                     }
                 }
+                // Warn if properties were passed that are not recognized to highlight mistakes
+                foreach (var propName in ((object)modified).GetDynamicPropertyNames().Where(name => type.GetProperty(name) == null)) {
+                    logger.LogWarning($"Unknown property \"{propName}\" on {type.Name} at path \"{path}\"");
+                }
                 // KubeObjects, compare properties recursively
                 foreach (PropertyInfo prop in type.GetProperties()) {
                     logger.LogTrace($"Property {prop.Name}");
