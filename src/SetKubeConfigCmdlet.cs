@@ -19,7 +19,7 @@ namespace Kubectl {
             await base.ProcessRecordAsync(cancellationToken);
             Serializer serializer = new SerializerBuilder().Build();
             string yaml = serializer.Serialize(Config);
-            string configPath = ConfigHelpers.LocateConfig();
+            string configPath = K8sConfig.Locate();
             if (ShouldProcess(configPath, "update")) {
                 await File.WriteAllTextAsync(configPath, yaml); // Do not pass cancellationToken to not corrupt config file
             }

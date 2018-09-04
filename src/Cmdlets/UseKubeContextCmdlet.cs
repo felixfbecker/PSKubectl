@@ -19,7 +19,7 @@ namespace Kubectl.Cmdlets {
 
         protected override async Task ProcessRecordAsync(CancellationToken cancellationToken) {
             await base.ProcessRecordAsync(cancellationToken);
-            string configPath = ConfigHelpers.LocateConfig();
+            string configPath = K8sConfig.Locate();
             K8sConfig config = K8sConfig.Load(configPath);
             config.CurrentContextName = Context;
             Serializer serializer = new SerializerBuilder().Build();
