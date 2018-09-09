@@ -55,26 +55,28 @@ namespace Kubectl {
         /// <param name="current">The configuration in the current state on the server</param>
         /// <param name="modified">The user-modified local configuration</param>
         /// <param name="annotate">If true, update the annotation in <paramref name="modified">modified</paramref> with the value of modified before diffing</param>
-        public void CreateThreeWayPatchFromLastApplied(dynamic current, dynamic modified, Type type, JsonPatchDocument patch, bool annotate) {
+        public void CreateThreeWayPatchFromLastApplied(object current, object modified, Type type, JsonPatchDocument patch, bool annotate) {
             if (current == null) throw new ArgumentNullException(nameof(current));
             if (modified == null) throw new ArgumentNullException(nameof(modified));
             if (type == null) throw new ArgumentNullException(nameof(type));
             if (patch == null) throw new ArgumentNullException(nameof(patch));
 
             object original = modified;
-            var originalJson = (string)((IDictionary)current.Metadata.Annotations)[Annotations.LastAppliedConfig];
+            var originalAnnotations = (IDictionary)current.GetDynamicPropertyValue("Metadata")?.GetDynamicPropertyValue("Annotations");
+            var originalJson = (string)originalAnnotations?[Annotations.LastAppliedConfig];
             if (!String.IsNullOrEmpty(originalJson)) {
                 original = JsonConvert.DeserializeObject(originalJson, type);
             }
             if (annotate) {
                 var modifiedJson = JsonConvert.SerializeObject(modified, new PSObjectJsonConverter());
-                if (modified.Metadata == null) {
-                    ((object)modified).SetDynamicPropertyValue("Metadata", new PSObject());
+                if (modified.GetDynamicPropertyValue("Metadata") == null) {
+                    modified.SetDynamicPropertyValue("Metadata", new PSObject());
                 }
-                if (modified.Metadata.Annotations == null) {
-                    ((object)modified.Metadata).SetDynamicPropertyValue("Annotations", new Dictionary<string, string>());
+                if (modified.GetDynamicPropertyValue("Metadata").GetDynamicPropertyValue("Annotations") == null) {
+                    modified.GetDynamicPropertyValue("Metadata").SetDynamicPropertyValue("Annotations", new Dictionary<string, string>());
                 }
-                modified.Metadata.Annotations[Annotations.LastAppliedConfig] = modifiedJson;
+                var annotations = (IDictionary)modified.GetDynamicPropertyValue("Metadata").GetDynamicPropertyValue("Annotations");
+                annotations[Annotations.LastAppliedConfig] = modifiedJson;
             }
             CreateThreeWayPatch(original, modified, current, type, patch);
         }
@@ -87,7 +89,7 @@ namespace Kubectl {
         /// <param name="original">The original configuration from the annotation in <paramref name="current">current</paramref></param>
         /// <param name="modified">The user-modified local configuration</param>
         /// <param name="current">The configuration in the current state on the server</param>
-        public void CreateThreeWayPatch(dynamic original, dynamic modified, dynamic current, Type type, JsonPatchDocument patch) {
+        public void CreateThreeWayPatch(object original, object modified, dynamic current, Type type, JsonPatchDocument patch) {
             if (current == null) throw new ArgumentNullException(nameof(current));
             if (modified == null) throw new ArgumentNullException(nameof(modified));
             if (current == null) throw new ArgumentNullException(nameof(current));
@@ -114,7 +116,7 @@ namespace Kubectl {
         /// <param name="type">The type that original and modified represent (even if they are not actually that type, but a PSObject)</param>
         /// <param name="path">The JSON pointer to the currently inspected values</param>
         /// <param name="mergeStrategy">The strategy to use for patching (replace or merge with mergeKey)</param>
-        public void CreateTwoWayPatch(dynamic original, dynamic modified, Type type, JsonPatchDocument patch, string path = "", MergeStrategyAttribute mergeStrategy = null, bool ignoreDeletions = false, bool ignoreAdditionsAndModifications = false) {
+        public void CreateTwoWayPatch(object original, object modified, Type type, JsonPatchDocument patch, string path = "", MergeStrategyAttribute mergeStrategy = null, bool ignoreDeletions = false, bool ignoreAdditionsAndModifications = false) {
             if (type == null) throw new ArgumentNullException(nameof(type));
             if (patch == null) throw new ArgumentNullException(nameof(patch));
             if (path == null) throw new ArgumentNullException(nameof(path));
@@ -360,13 +362,13 @@ namespace Kubectl {
                 // https://github.com/kubernetes/community/blob/master/contributors/devel/api-conventions.md#metadata
                 // Add this test before traversing into other properties
                 if (type.IsSubclassOf(typeof(KubeResourceV1))) {
-                    var resourceVersion = (string)original?.Metadata?.ResourceVersion;
+                    var resourceVersion = (string)original.GetDynamicPropertyValue("Metadata")?.GetDynamicPropertyValue("ResourceVersion");
                     if (!String.IsNullOrEmpty(resourceVersion)) {
                         patch.Test(path + "/metadata/resourceVersion", resourceVersion);
                     }
                 }
                 // Warn if properties were passed that are not recognized to highlight mistakes
-                foreach (var propName in ((object)modified).GetDynamicPropertyNames().Where(name => type.GetProperty(name) == null)) {
+                foreach (var propName in modified.GetDynamicPropertyNames().Where(name => type.GetProperty(name) == null)) {
                     logger.LogWarning($"Unknown property \"{propName}\" on {type.Name} at path \"{path}\"");
                 }
                 // KubeObjects, compare properties recursively
@@ -381,8 +383,8 @@ namespace Kubectl {
                     JsonPropertyAttribute jsonAttribute = (JsonPropertyAttribute)prop.GetCustomAttribute(typeof(JsonPropertyAttribute));
                     string propPath = path + "/" + escapeJsonPointer(jsonAttribute.PropertyName);
 
-                    object originalValue = ((object)original).GetDynamicPropertyValue(prop.Name);
-                    object modifiedValue = ((object)modified).GetDynamicPropertyValue(prop.Name);
+                    object originalValue = original.GetDynamicPropertyValue(prop.Name);
+                    object modifiedValue = modified.GetDynamicPropertyValue(prop.Name);
 
                     if (!isPropertyUpdateable(type, prop)) {
                         continue;
