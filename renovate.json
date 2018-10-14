@@ -1,6 +1,6 @@
 {
   "extends": ["config:base", ":maintainLockFilesMonthly"],
-  "semanticCommits": false,
+  "semanticCommits": true,
   "prCreation": "not-pending",
   "rangeStrategy": "replace",
   "nuget": {
