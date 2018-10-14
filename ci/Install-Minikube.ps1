@@ -25,6 +25,8 @@ Invoke-Executable { sudo minikube start --vm-driver=none --kubernetes-version=$K
 
 # Fix the kubectl context, as it's often stale.
 Invoke-Executable { minikube update-context }
+# Output debug information
+Write-Information "Current context: $(Invoke-Executable { kubectl config current-context })"
 
 # Little helper to poll a command until the resource status reports a {Type: Ready, Status: True} condition
 function Wait-KubeConditions([scriptblock] $Command, [string]$Label) {
@@ -43,7 +45,7 @@ function Wait-KubeConditions([scriptblock] $Command, [string]$Label) {
         }
         Start-Sleep 1
         if ($timer.Elapsed.TotalSeconds -gt 60) {
-            throw "Timed out after 60s waiting for node to become ready"
+            throw "Timed out after 60s waiting for $Label to become ready"
         }
     }
     $timer.Stop()
