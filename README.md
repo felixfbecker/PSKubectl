@@ -13,16 +13,6 @@
 Runs in PowerShell Core on macOS, Linux and Windows. Note: Windows PowerShell v5 is not supported. If you are on Windows, you need to install PowerShell Core.
 You must use PowerShell Core `v6.1.0-preview.3` or newer.
 
-## Authentication
-
-You currently need to run `kubectl proxy` in the background and connect to that as auth providers are not implemented yet.
-
-You can configure the default host to use for all cmdlets by adding this to your profile.ps1:
-
-```powershell
-$PSDefaultParameterValues['*-Kube*:ApiEndPoint'] = 'http://127.0.0.1:8001'
-```
-
 ## Features
 
 ### App Management
@@ -101,6 +91,10 @@ A convenience cmdlet to update kubeconfig. Does nothing but serialize a given co
 #### `Use-KubeContext`
 
 A convenience cmdlet to update the current context. Supports tab-completion for the context name. Equivalent of `kubectl config use-context`.
+
+## Authentication
+
+PSKubectl reads authentication from your `~/.kube/config` and includes support for command-based authentication as used by GKE.
 
 ## Development
 

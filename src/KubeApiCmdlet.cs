@@ -35,6 +35,7 @@ namespace Kubectl {
             if (ApiEndPoint != null) {
                 clientOptions.ApiEndPoint = ApiEndPoint;
             }
+            WriteVerbose($"Using endpoint {clientOptions.ApiEndPoint}");
             // clientOptions.LogHeaders = true;
             // clientOptions.LogPayloads = true;
             client = KubeApiClient.Create(clientOptions, LoggerFactory);
