@@ -16,7 +16,7 @@ try {
     $kubectlProxy = Start-Job { kubectl proxy }
     try {
         # Run tests in isolated PowerShell instance to not lock coverage and DLL files longer than test run
-        pwsh-preview -Command {
+        pwsh -Command {
             # Point all commands to the kubectl proxy
             $PSBoundParameters['*-Kube*:ApiEndPoint'] = 'http://127.0.0.1:8001'
             # Import instrumented assemblies
