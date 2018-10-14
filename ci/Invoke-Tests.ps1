@@ -12,20 +12,11 @@ try {
     # Instrument assemblies for code coverage prior to importing
     Invoke-Executable { dotnet minicover instrument --workdir ../ --assemblies ./PSKubectl/Assemblies/PSKubectl.dll --sources './src/**/*.cs' }
 
-    # Start kubectl proxy in the background (until we support auth properly)
-    $kubectlProxy = Start-Job { kubectl proxy }
-    try {
-        # Run tests in isolated PowerShell instance to not lock coverage and DLL files longer than test run
-        pwsh -Command {
-            # Point all commands to the kubectl proxy
-            $PSBoundParameters['*-Kube*:ApiEndPoint'] = 'http://127.0.0.1:8001'
-            # Import instrumented assemblies
-            Import-Module ../PSKubectl/PSKubectl.psd1
-            Invoke-Pester ../Tests
-        }
-    } finally {
-        # Stop proxy
-        Stop-Job -Job $kubectlProxy
+    # Run tests in isolated PowerShell instance to not lock coverage and DLL files longer than test run
+    pwsh -Command {
+        # Import instrumented assemblies
+        Import-Module ../PSKubectl/PSKubectl.psd1
+        Invoke-Pester ../Tests
     }
 
     # Output coverage reports
