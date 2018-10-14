@@ -2,7 +2,7 @@
 [![powershellgallery](https://img.shields.io/powershellgallery/v/PSKubectl.svg)](https://www.powershellgallery.com/packages/PSKubectl)
 [![downloads](https://img.shields.io/powershellgallery/dt/PSKubectl.svg?label=downloads)](https://www.powershellgallery.com/packages/PSKubectl)
 [![build](https://img.shields.io/travis/felixfbecker/PSKubectl/master.svg)](https://travis-ci.org/felixfbecker/PSKubectl)
-![powershell: >=6.1.0-preview.3](https://img.shields.io/badge/powershell-%3E%3D6.1.0--preview.3-orange.svg)
+![powershell: >=6.1.0](https://img.shields.io/badge/powershell-%3E%3D6.1.0-blue.svg)
 [![codecov](https://codecov.io/gh/felixfbecker/PSKubectl/branch/master/graph/badge.svg)](https://codecov.io/gh/felixfbecker/PSKubectl)
 
 🚧 Work in progress 🚧 
