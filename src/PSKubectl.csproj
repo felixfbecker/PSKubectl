@@ -9,7 +9,7 @@
         <PackageReference Include="KubeClient" Version="2.2.0-auth-cmd0070" />
         <PackageReference Include="KubeClient.Extensions.KubeConfig" Version="2.2.0-auth-cmd0070" />
         <PackageReference Include="Microsoft.AspNetCore.JsonPatch" Version="2.1.1" />
-        <PackageReference Include="Microsoft.PowerShell.SDK" Version="6.1.0" />
+        <PackageReference Include="Microsoft.PowerShell.SDK" Version="6.1.1" />
         <!-- <PackageReference Include="Serilog.Extensions.Logging.File" Version="1.1.0" /> -->
         <DotNetCliToolReference Include="MiniCover" Version="2.0.0-ci-20180315091931" />
     </ItemGroup>
