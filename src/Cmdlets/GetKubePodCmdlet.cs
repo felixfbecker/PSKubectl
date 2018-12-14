@@ -14,6 +14,7 @@ namespace Kubectl.Cmdlets {
     [OutputType(new[] { typeof(PodV1) })]
     public sealed class GetKubePodCmdlet : KubeApiCmdlet {
         [Parameter(ValueFromPipelineByPropertyName = true)]
+        [Alias("Ns")]
         public string Namespace { get; set; }
 
         [Parameter()]

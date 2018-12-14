@@ -14,6 +14,7 @@ namespace Kubectl.Cmdlets {
     [OutputType(new[] { typeof(DeploymentV1) })]
     public sealed class GetKubeDeploymentCmdlet : KubeApiCmdlet {
         [Parameter(ValueFromPipelineByPropertyName = true)]
+        [Alias("Ns")]
         public string Namespace { get; set; }
 
         [Parameter()]

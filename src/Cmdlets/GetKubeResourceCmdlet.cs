@@ -14,7 +14,8 @@ namespace Kubectl.Cmdlets {
     [OutputType(new[] { typeof(KubeResourceV1) })]
     public sealed class GetKubeResourceCmdlet : KubeApiCmdlet {
         [Parameter(ValueFromPipelineByPropertyName = true)]
-        public string Namespace { get; set; } = "default";
+        [Alias("Ns")]
+        public string Namespace { get; set; }
 
         [Parameter(Mandatory = true, Position = 0, ValueFromPipelineByPropertyName = true)]
         public string Kind { get; set; }
