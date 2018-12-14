@@ -8,7 +8,7 @@ phases:
     steps:
       - task: DotNetCoreInstaller@0
         inputs:
-          version: '2.1.400'
+          version: '2.2.101'
         displayName: 'Install .NET Core SDK'
       - powershell: ./build.ps1
         env:
