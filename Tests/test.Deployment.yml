@@ -15,6 +15,7 @@ spec:
     spec:
       containers:
         - name: hello-world
-          image: strm/helloworld-http:latest
+          image: strm/helloworld-http@sha256:bd44b0ca80c26b5eba984bf498a9c3bab0eb1c59d30d8df3cb2c073937ee4e45
+          imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 80
