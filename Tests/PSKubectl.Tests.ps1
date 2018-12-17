@@ -129,7 +129,7 @@ Describe Update-KubeResource {
         $before = (Invoke-Executable { kubectl get deploy -n pskubectltest -o json } | ConvertFrom-Json).Items
         $modified = [pscustomobject]@{
             Kind = 'Deployment'
-            ApiVersion = 'v1'
+            ApiVersion = 'apps/v1'
             Metadata = [pscustomobject]@{
                 Name = 'hello-world'
                 Namespace = 'pskubectltest'
