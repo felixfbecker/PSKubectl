@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Management.Automation;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using KubeClient;
@@ -31,6 +32,9 @@ namespace Kubectl.Cmdlets {
         protected override async Task ProcessRecordAsync(CancellationToken cancellationToken) {
             await base.ProcessRecordAsync(cancellationToken);
             if (ParameterSetName == "Parameters") {
+                if (Name != null) {
+                    Name = Regex.Replace(Name, "^pods?/", "", RegexOptions.IgnoreCase);
+                }
                 if (LabelSelector != null || WildcardPattern.ContainsWildcardCharacters(Name)) {
                     IEnumerable<PodV1> podList = await client.PodsV1().List(
                         kubeNamespace: Namespace,
