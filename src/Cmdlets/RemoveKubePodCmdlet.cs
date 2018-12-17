@@ -10,17 +10,17 @@ using KubeClient.ResourceClients;
 using Microsoft.Extensions.Logging;
 
 namespace Kubectl.Cmdlets {
-    [Cmdlet(VerbsCommon.Remove, "KubePod", SupportsShouldProcess = true)]
+    [Cmdlet(VerbsCommon.Remove, "KubePod", SupportsShouldProcess = true, DefaultParameterSetName = "Parameters")]
     [OutputType(new[] { typeof(PodV1) })]
     public sealed class RemoveKubePodCmdlet : KubeApiCmdlet {
-        [Parameter(ParameterSetName = "Parameters")]
         [Alias("Ns")]
+        [Parameter(ParameterSetName = "Parameters")]
         public string Namespace { get; set; }
 
         [Parameter(ParameterSetName = "Parameters")]
         public string LabelSelector { get; set; }
 
-        [Parameter(Mandatory = true, Position = 0, ParameterSetName = "Parameters")]
+        [Parameter(Position = 0, ParameterSetName = "Parameters", ValueFromPipeline = true)]
         [SupportsWildcards()]
         public string Name { get; set; }
 

@@ -30,6 +30,15 @@ Describe Remove-KubePod {
             Should -BeNullOrEmpty
     }
 
+    It 'Should delete pods given by piped name' {
+        $before = (Invoke-Executable { kubectl get pods -n pskubectltest -o json } | ConvertFrom-Json).Items.Metadata.Name
+        $before | Should -Not -BeNullOrEmpty
+        $before | Remove-KubePod -Namespace pskubectltest -ErrorAction Stop
+        (Invoke-Executable { kubectl get pods -n pskubectltest -o json } | ConvertFrom-Json).Items |
+            Where-Object { $_.Metadata.Name -in $before -and $_.Metadata.DeletionTimestamp -eq $null } |
+            Should -BeNullOrEmpty
+    }
+
     It 'Should delete pods piped from Get-KubePod' {
         $before = Invoke-Executable { kubectl get pods -n pskubectltest -o name }
         $before | Should -Not -BeNullOrEmpty
