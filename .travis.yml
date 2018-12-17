@@ -44,6 +44,7 @@ jobs:
         directories:
           - ~/.npm
       install:
+        - sudo ln -s /usr/bin/pwsh-preview /usr/bin/pwsh
         - nvm install 10
         - nvm use 10
         - npm ci
