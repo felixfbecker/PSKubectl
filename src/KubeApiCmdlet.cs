@@ -20,6 +20,10 @@ namespace Kubectl {
         [Parameter()]
         public SwitchParameter AllowInsecure { get; set; }
 
+        /// <summary>Log request payloads to the verbose output channel</summary>
+        [Parameter()]
+        public SwitchParameter LogPayloads { get; set; }
+
         protected K8sConfig config;
 
         /// <summary>The API client to be used by child cmdlets</summary>
@@ -37,7 +41,7 @@ namespace Kubectl {
             }
             WriteVerbose($"Using endpoint {clientOptions.ApiEndPoint}");
             // clientOptions.LogHeaders = true;
-            // clientOptions.LogPayloads = true;
+            clientOptions.LogPayloads = LogPayloads;
             client = KubeApiClient.Create(clientOptions, LoggerFactory);
         }
 
