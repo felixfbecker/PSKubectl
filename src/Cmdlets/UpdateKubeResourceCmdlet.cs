@@ -56,11 +56,10 @@ namespace Kubectl.Cmdlets {
             if (String.IsNullOrEmpty(kind)) {
                 throw new Exception("Input object does not have Kind set");
             }
-            string apiGroupVersion = (string)modified.ApiVersion;
-            if (String.IsNullOrEmpty(apiGroupVersion)) {
+            string apiVersion = (string)modified.ApiVersion;
+            if (String.IsNullOrEmpty(apiVersion)) {
                 throw new Exception("Input object does not have ApiVersion set");
             }
-            string apiVersion = apiGroupVersion.Split('/').Last();
 
             // Figure out the model class - needed for diffing
             Type type = ModelTypes.GetValueOrDefault((kind, apiVersion));
