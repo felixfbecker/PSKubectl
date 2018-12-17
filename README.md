@@ -3,7 +3,7 @@
 [![downloads](https://img.shields.io/powershellgallery/dt/PSKubectl.svg?label=downloads)](https://www.powershellgallery.com/packages/PSKubectl)
 [![build](https://img.shields.io/travis/felixfbecker/PSKubectl/master.svg)](https://travis-ci.org/felixfbecker/PSKubectl)
 ![powershell: >=6.1.0](https://img.shields.io/badge/powershell-%3E%3D6.1.0-blue.svg)
-![platform](https://img.shields.io/powershellgallery/p/PSKubectl.svg)
+![platform](https://img.shields.io/powershellgallery/p/PSKubectl.svg?colorB=blue)
 [![codecov](https://codecov.io/gh/felixfbecker/PSKubectl/branch/master/graph/badge.svg)](https://codecov.io/gh/felixfbecker/PSKubectl)
 [![semantic-release](https://img.shields.io/badge/%20%20%F0%9F%93%A6%F0%9F%9A%80-semantic--release-e10079.svg)](https://github.com/semantic-release/semantic-release)
 
