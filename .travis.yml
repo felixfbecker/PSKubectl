@@ -11,7 +11,7 @@ addons:
       - sourceline: deb [arch=amd64] https://packages.microsoft.com/ubuntu/14.04/prod trusty main
         key_url: https://packages.microsoft.com/keys/microsoft.asc
     packages:
-      - powershell
+      - powershell-preview
 
 env:
   global:
@@ -21,6 +21,7 @@ env:
     - FORCE_COLOR=1
 
 install:
+  - sudo ln -s /usr/bin/pwsh-preview /usr/bin/pwsh
   - pwsh ./ci/Install-Minikube.ps1 -KubectlVersion v1.9.0 -MinikubeVersion v0.25.2 -KubernetesVersion v1.9.0
   - pwsh -c 'Install-Module -Force -Scope CurrentUser PSScriptAnalyzer'
 
