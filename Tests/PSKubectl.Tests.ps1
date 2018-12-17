@@ -66,6 +66,16 @@ Describe Remove-KubePod {
             $pod.Metadata.DeletionTimestamp | Should -Not -BeNullOrEmpty
         }
     }
+
+    It 'Should delete a pod by name with prefix' {
+        $name = (Invoke-Executable { kubectl get pods -n pskubectltest -o json } | ConvertFrom-Json).Items[0].Metadata.Name
+        $name | Should -Not -BeNullOrEmpty
+        Remove-KubePod -Name "pod/$name" -Namespace pskubectltest
+        $pod = (Invoke-Executable { kubectl get pods -n pskubectltest -o json $name } | ConvertFrom-Json)
+        if ($pod) {
+            $pod.Metadata.DeletionTimestamp | Should -Not -BeNullOrEmpty
+        }
+    }
 }
 
 Describe Get-KubeResource {
