@@ -13,15 +13,19 @@ try {
     Invoke-Executable { dotnet minicover instrument --workdir ../ --assemblies ./PSKubectl/Assemblies/PSKubectl.dll --sources './src/**/*.cs' }
 
     # Run tests in isolated PowerShell instance to not lock coverage and DLL files longer than test run
-    pwsh -Command {
+    $testResult = pwsh -Command {
         # Import instrumented assemblies
         Import-Module ../PSKubectl/PSKubectl.psd1
-        Invoke-Pester ../Tests
+        Invoke-Pester ../Tests -PassThru
     }
 
     # Output coverage reports
     Invoke-Executable { dotnet minicover report --workdir ../ --threshold 0 }
     Invoke-Executable { dotnet minicover opencoverreport --workdir ../ }
+
+    if ($testResult.FailedCount -gt 0) {
+        exit 1
+    }
 } finally {
     Pop-Location
 }
