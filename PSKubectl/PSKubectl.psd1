@@ -15,7 +15,7 @@
     ModuleVersion = '0.0.1'
 
     # Supported PSEditions
-    # CompatiblePSEditions = @('Core')
+    CompatiblePSEditions = @('Core')
 
     # ID used to uniquely identify this module
     GUID = 'e30ad1d5-2463-486f-976e-913f84ad2aca'
@@ -33,7 +33,7 @@
     Description = 'kubectl with the power of the object pipeline'
 
     # Minimum version of the PowerShell engine required by this module
-    # PowerShellVersion = '6.1.0-preview.3'
+    PowerShellVersion = '6.1.0'
 
     # Name of the PowerShell host required by this module
     # PowerShellHostName = ''
