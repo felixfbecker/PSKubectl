@@ -99,6 +99,7 @@
         'Get-KubePod',
         'Get-KubeResource',
         'Get-KubeResourceKinds',
+        'Remove-KubePod',
         'Set-KubeConfig',
         'Update-KubeResource',
         'Use-KubeContext'
