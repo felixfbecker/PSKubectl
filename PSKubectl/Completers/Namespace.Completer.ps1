@@ -14,6 +14,7 @@ $namespaceCompleter = {
 }
 
 Register-ArgumentCompleter -CommandName Get-KubePod -ParameterName Namespace -ScriptBlock $namespaceCompleter
+Register-ArgumentCompleter -CommandName Remove-KubePod -ParameterName Namespace -ScriptBlock $namespaceCompleter
 Register-ArgumentCompleter -CommandName Get-KubeResource -ParameterName Namespace -ScriptBlock $namespaceCompleter
 Register-ArgumentCompleter -CommandName Get-KubeDeployment -ParameterName Namespace -ScriptBlock $namespaceCompleter
 Register-ArgumentCompleter -CommandName Get-KubeLog -ParameterName Namespace -ScriptBlock $namespaceCompleter

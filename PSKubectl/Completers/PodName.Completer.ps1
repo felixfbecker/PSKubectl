@@ -13,4 +13,5 @@ $podNameCompleter = {
 }
 
 Register-ArgumentCompleter -CommandName Get-KubePod -ParameterName Name -ScriptBlock $podNameCompleter
+Register-ArgumentCompleter -CommandName Remove-KubePod -ParameterName Name -ScriptBlock $podNameCompleter
 Register-ArgumentCompleter -CommandName Get-KubeLog -ParameterName Name -ScriptBlock $podNameCompleter
