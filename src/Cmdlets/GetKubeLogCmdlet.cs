@@ -30,6 +30,9 @@ namespace Kubectl.Cmdlets {
         [Parameter()]
         public int? LimitBytes { get; set; }
 
+        [Parameter()]
+        public int? Tail { get; set; }
+
         protected override async Task ProcessRecordAsync(CancellationToken cancellationToken) {
             base.BeginProcessing();
             if (Follow) {
@@ -37,7 +40,8 @@ namespace Kubectl.Cmdlets {
                     kubeNamespace: Namespace,
                     name: Name,
                     containerName: Container,
-                    limitBytes: LimitBytes
+                    limitBytes: LimitBytes,
+                    tailLines: Tail
                 );
                 await logs.ObserveOn(SynchronizationContext.Current).ForEachAsync(WriteObject, cancellationToken);
             } else {
@@ -46,6 +50,7 @@ namespace Kubectl.Cmdlets {
                     name: Name,
                     containerName: Container,
                     limitBytes: LimitBytes,
+                    tailLines: Tail,
                     cancellationToken: cancellationToken
                 );
                 WriteObject(logs);
