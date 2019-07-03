@@ -42,7 +42,8 @@ namespace Kubectl {
             WriteVerbose($"Using endpoint {clientOptions.ApiEndPoint}");
             // clientOptions.LogHeaders = true;
             clientOptions.LogPayloads = LogPayloads;
-            client = KubeApiClient.Create(clientOptions, LoggerFactory);
+            clientOptions.LoggerFactory = LoggerFactory;
+            client = KubeApiClient.Create(clientOptions);
         }
 
         protected override void Dispose(bool disposing) {
