@@ -6,8 +6,8 @@
     <ItemGroup>
         <!-- <ProjectReference Include="../../../tintoy/dotnet-kube-client/src/KubeClient/KubeClient.csproj" /> -->
         <!-- <ProjectReference Include="../../../tintoy/dotnet-kube-client/src/KubeClient.Extensions.KubeConfig/KubeClient.Extensions.KubeConfig.csproj" /> -->
-        <PackageReference Include="KubeClient" Version="2.2.6" />
-        <PackageReference Include="KubeClient.Extensions.KubeConfig" Version="2.2.6" />
+        <PackageReference Include="KubeClient" Version="2.2.14" />
+        <PackageReference Include="KubeClient.Extensions.KubeConfig" Version="2.2.14" />
         <PackageReference Include="Microsoft.AspNetCore.JsonPatch" Version="2.1.1" />
         <PackageReference Include="Microsoft.PowerShell.SDK" Version="6.1.1" />
         <!-- <PackageReference Include="Serilog.Extensions.Logging.File" Version="1.1.0" /> -->
