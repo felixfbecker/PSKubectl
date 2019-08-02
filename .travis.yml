@@ -1,5 +1,5 @@
 language: csharp
-dotnet: '2.1.801'
+dotnet: '2.1.701'
 mono: none
 
 sudo: required
