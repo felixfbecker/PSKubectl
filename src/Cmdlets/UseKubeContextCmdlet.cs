@@ -25,7 +25,9 @@ namespace Kubectl.Cmdlets {
             Serializer serializer = new SerializerBuilder().Build();
             string yaml = serializer.Serialize(config);
             if (ShouldProcess(configPath, "update")) {
-                await File.WriteAllTextAsync(configPath, yaml); // Do not pass cancellationToken to not corrupt config file
+                using (var streamWriter = new StreamWriter(configPath)) {
+                    await streamWriter.WriteAsync(yaml); // Do not pass cancellationToken to not corrupt config file
+                }
             }
         }
     }
