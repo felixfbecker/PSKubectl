@@ -33,7 +33,8 @@ namespace Kubectl {
             await base.BeginProcessingAsync(cancellationToken);
             config = K8sConfig.Load();
             KubeClientOptions clientOptions = config.ToKubeClientOptions(
-                defaultKubeNamespace: "default"
+                defaultKubeNamespace: "default",
+                loggerFactory: LoggerFactory
             );
             clientOptions.AllowInsecure = AllowInsecure;
             if (ApiEndPoint != null) {
@@ -42,7 +43,7 @@ namespace Kubectl {
             WriteVerbose($"Using endpoint {clientOptions.ApiEndPoint}");
             // clientOptions.LogHeaders = true;
             clientOptions.LogPayloads = LogPayloads;
-            client = KubeApiClient.Create(clientOptions, LoggerFactory);
+            client = KubeApiClient.Create(clientOptions);
         }
 
         protected override void Dispose(bool disposing) {
