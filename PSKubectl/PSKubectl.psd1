@@ -92,6 +92,7 @@
     CmdletsToExport = @(
         'Compare-KubeResource',
         'ConvertFrom-KubeYaml',
+        'ConvertTo-KubeYaml',
         'Get-KubeConfig',
         'Get-KubeDeployment',
         'Get-KubeLog',

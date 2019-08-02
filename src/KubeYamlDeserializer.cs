@@ -23,14 +23,18 @@ namespace Kubectl {
                 .Build();
         }
 
+        /// <summary>
+        /// Deserializes the given Kubernetes resource YAML string to PSObjects
+        /// with type names, Dictionaries and Lists depending on the kind of the
+        /// resource and its schema.
+        /// </summary>
         public object Deserialize(string yaml) {
             if (yaml == null) throw new ArgumentNullException(nameof(yaml));
 
             // Deserialize to Dictionary first to check the kind field to determine the type
             Dictionary<string, object> dict = deserializer.Deserialize<Dictionary<string, object>>(yaml);
             string kind = (string)dict["kind"];
-            string apiGroupVersion = (string)dict["apiVersion"];
-            string apiVersion = apiGroupVersion.Split('/').Last();
+            string apiVersion = (string)dict["apiVersion"];
             logger.LogDebug($"apiVersion {apiVersion}");
             if (!modelTypes.TryGetValue((kind, apiVersion), out Type type)) {
                 throw new Exception($"Unknown (kind: {kind}, apiVersion: {apiVersion}). {modelTypes.Count} Known:\n{String.Join("\n", modelTypes.Keys)}");

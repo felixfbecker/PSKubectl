@@ -25,7 +25,7 @@ New-Item -ItemType Directory -Path $HOME/.kube, $HOME/.minikube
 New-Item -ItemType File -Path $env:KUBECONFIG
 
 # Start minikube
-Invoke-Executable { sudo minikube start --vm-driver=none --kubernetes-version=$KubernetesVersion }
+Invoke-Executable { sudo minikube start --vm-driver=none --feature-gates=ServerSideApply=true --kubernetes-version=$KubernetesVersion }
 
 Invoke-Executable { sudo chown -R travis: /home/travis/.minikube/ }
 

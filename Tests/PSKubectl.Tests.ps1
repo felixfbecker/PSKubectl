@@ -125,26 +125,37 @@ Describe Update-KubeResource {
 
     BeforeAll { Initialize-TestNamespace }
 
-    It 'Should update the resource from pipeline input' {
+    It 'Should update the resource from PSCustomObject pipeline input' {
         $before = (Invoke-Executable { kubectl get deploy -n pskubectltest -o json } | ConvertFrom-Json).Items
+        $before.Metadata.Annotations.hello | Should -Be 'world'
         $modified = [pscustomobject]@{
             Kind = 'Deployment'
             ApiVersion = 'apps/v1'
             Metadata = [pscustomobject]@{
                 Name = 'hello-world'
                 Namespace = 'pskubectltest'
-            }
-            Spec = [pscustomobject]@{
-                Replicas = 3 # increase replicas by 1
+                Annotations = @{
+                    'hello' = 'changed'
+                }
             }
         }
         $result = $modified | Update-KubeResource
         $result | Should -Not -BeNullOrEmpty
         $result | Should -BeOfType KubeClient.Models.DeploymentV1
-        $result.Spec.Replicas | Should -Be 3
+        $result.Metadata.Annotations['hello'] | Should -Be 'changed'
         $after = (Invoke-Executable { kubectl get deploy -n pskubectltest -o json } | ConvertFrom-Json).Items
-        $after.Spec.Replicas | Should -Be 3
-        $after.Metadata.Annotations.'kubectl.kubernetes.io/last-applied-configuration' | Should -Not -Be $before.Metadata.Annotations.'kubectl.kubernetes.io/last-applied-configuration'
+        $after.Metadata.Annotations.hello | Should -Be 'changed'
+    }
+
+    It 'Should update the resource from a path to a YAML file' {
+        $before = (Invoke-Executable { kubectl get deploy -n pskubectltest -o json } | ConvertFrom-Json).Items
+        $before.Metadata.Annotations['hello'] | Should -Be 'world'
+        $result = Update-KubeResource -Path $PSScriptRoot/modified.Deployment.yml -LogPayloads
+        $result | Should -Not -BeNullOrEmpty
+        $result | Should -BeOfType KubeClient.Models.DeploymentV1
+        $result.Metadata.Annotations['hello'] | Should -Be 'changed'
+        $after = (Invoke-Executable { kubectl get deploy -n pskubectltest -o json } | ConvertFrom-Json).Items
+        $after.Metadata.Annotations.hello | Should -Be 'changed'
     }
 }
 
