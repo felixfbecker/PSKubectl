@@ -12,7 +12,9 @@ try {
         $options += '--no-restore'
     }
     dotnet build --output ../PSKubectl/Assemblies --configuration $Configuration @options
-    Remove-Item  ../PSKubectl/Assemblies/Newtonsoft.Json.dll # PowerShell Core ships with this DLL already and cannot load 2 DLLs of the same type anyway
+    # PowerShell Core ships with some DLLs already and cannot load 2 DLLs of the same type anyway
+    Remove-Item  ../PSKubectl/Assemblies/Newtonsoft.Json.dll
+    Remove-Item  ../PSKubectl/Assemblies/Microsoft.CSharp.dll
     if ($LASTEXITCODE -ne 0) {
         throw "Build failed"
     }
