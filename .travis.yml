@@ -7,14 +7,6 @@ sudo: required
 # We need the systemd for the kubeadm and it's default from 16.04+
 dist: xenial
 
-addons:
-  apt:
-    sources:
-      - sourceline: deb [arch=amd64] https://packages.microsoft.com/ubuntu/16.04/prod trusty main
-        key_url: https://packages.microsoft.com/keys/microsoft.asc
-    packages:
-      - powershell
-
 env:
   global:
     # This moves Kubernetes specific config files.
@@ -25,6 +17,12 @@ env:
     - KUBECONFIG=$HOME/.kube/config
     - DOTNET_SKIP_FIRST_TIME_EXPERIENCE=true
     - FORCE_COLOR=1
+
+before_install:
+  - wget -q https://packages.microsoft.com/config/ubuntu/16.04/packages-microsoft-prod.deb
+  - sudo dpkg -i packages-microsoft-prod.deb
+  - sudo apt-get update
+  - sudo apt-get install -y powershell
 
 install:
   - dotnet tool install -g dotnet-format --version 3.1.37601
@@ -53,8 +51,6 @@ jobs:
         directories:
           - ~/.npm
       install:
-        - nvm install 10
-        - nvm use 10
         - npm ci
       script:
         - ./node_modules/.bin/semantic-release
