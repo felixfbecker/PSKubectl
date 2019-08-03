@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
     <PropertyGroup>
         <TargetFramework>netstandard2.0</TargetFramework>
-        <!-- <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies> -->
+        <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>        <!-- Workaround for NuGet bug to make dotnet build copy NuGet assemblies into bin folder as well: https://github.com/dotnet/sdk/issues/747#issuecomment-419497340 -->
     </PropertyGroup>
     <ItemGroup>
         <!-- <ProjectReference Include="../../../tintoy/dotnet-kube-client/src/KubeClient/KubeClient.csproj" /> -->

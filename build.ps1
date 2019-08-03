@@ -11,7 +11,7 @@ try {
     if ($NoRestore) {
         $options += '--no-restore'
     }
-    dotnet publish -o ../PSKubectl/Assemblies -c $Configuration @options
+    dotnet build --output ../PSKubectl/Assemblies -c $Configuration @options
     if ($LASTEXITCODE -ne 0) {
         throw "Build failed"
     }
