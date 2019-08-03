@@ -7,7 +7,7 @@
     "enabled": true,
     "rollbackPrs": false
   },
-  "ignoreDeps": ["Microsoft.PowerShell.SDK"],
+  "ignoreDeps": ["System.Management.Automation"],
   "packageRules": [
     {
       "packagePatterns": ["^KubeClient"],
