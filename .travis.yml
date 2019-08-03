@@ -4,7 +4,9 @@ mono: none
 
 sudo: required
 
-dist: trusty
+# We need the systemd for the kubeadm and it's default from 16.04+
+dist: xenial
+
 addons:
   apt:
     sources:
@@ -17,13 +19,17 @@ env:
   global:
     # This moves Kubernetes specific config files.
     - CHANGE_MINIKUBE_NONE_USER=true
+    - MINIKUBE_WANTUPDATENOTIFICATION=false
+    - MINIKUBE_WANTREPORTERRORPROMPT=false
+    - MINIKUBE_HOME=$HOME
+    - KUBECONFIG=$HOME/.kube/config
     - DOTNET_SKIP_FIRST_TIME_EXPERIENCE=true
     - FORCE_COLOR=1
 
 install:
   - sudo ln -s /usr/bin/pwsh-preview /usr/bin/pwsh
   - dotnet tool install -g dotnet-format --version 3.1.37601
-  - pwsh ./ci/Install-Minikube.ps1 -KubectlVersion v1.9.0 -MinikubeVersion v0.25.2 -KubernetesVersion v1.9.0
+  - pwsh ./ci/Install-Minikube.ps1 -MinikubeVersion v1.2.0 -KubernetesVersion v1.15.0
   - pwsh -c 'Install-Module -Force -Scope CurrentUser PSScriptAnalyzer'
 
 script:
