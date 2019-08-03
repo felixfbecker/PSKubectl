@@ -1,5 +1,9 @@
 language: csharp
+<<<<<<< Updated upstream
 dotnet: '2.1.700'
+=======
+dotnet: '2.2.401'
+>>>>>>> Stashed changes
 mono: none
 
 sudo: required
