@@ -31,8 +31,7 @@ namespace Kubectl {
             string apiGroupVersion = (string)dict["apiVersion"];
             string apiVersion = apiGroupVersion.Split('/').Last();
             logger.LogDebug($"apiVersion {apiVersion}");
-            Type type = modelTypes.GetValueOrDefault((kind, apiVersion));
-            if (type == null) {
+            if (!modelTypes.TryGetValue((kind, apiVersion), out Type type)) {
                 throw new Exception($"Unknown (kind: {kind}, apiVersion: {apiVersion}). {modelTypes.Count} Known:\n{String.Join("\n", modelTypes.Keys)}");
             }
             return toPSObject(dict, type);

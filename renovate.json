@@ -7,6 +7,7 @@
     "enabled": true,
     "rollbackPrs": false
   },
+  "ignoreDeps": ["Microsoft.PowerShell.SDK"],
   "packageRules": [
     {
       "packagePatterns": ["^KubeClient"],

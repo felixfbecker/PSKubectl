@@ -21,7 +21,9 @@ namespace Kubectl {
             string yaml = serializer.Serialize(Config);
             string configPath = K8sConfig.Locate();
             if (ShouldProcess(configPath, "update")) {
-                await File.WriteAllTextAsync(configPath, yaml); // Do not pass cancellationToken to not corrupt config file
+                using (var streamWriter = new StreamWriter(configPath)) {
+                    await streamWriter.WriteAsync(yaml); // Do not pass cancellationToken to not corrupt config file
+                }
             }
         }
     }

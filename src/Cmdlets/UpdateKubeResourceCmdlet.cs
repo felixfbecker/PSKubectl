@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Management.Automation;
 using System.Reflection;
@@ -42,7 +43,10 @@ namespace Kubectl.Cmdlets {
                 var paths = GetResolvedProviderPathFromPSPath(Path, out provider);
                 foreach (var path in paths) {
                     WriteVerbose($"Reading object from YAML file {path}");
-                    var yaml = await System.IO.File.ReadAllTextAsync(path, cancellationToken);
+                    string yaml;
+                    using (var streamReader = File.OpenText(path)) {
+                        yaml = await streamReader.ReadToEndAsync();
+                    }
                     var modified = deserializer.Deserialize(yaml);
                     await updateResource(modified, cancellationToken);
                 }
@@ -62,8 +66,7 @@ namespace Kubectl.Cmdlets {
             }
 
             // Figure out the model class - needed for diffing
-            Type type = ModelTypes.GetValueOrDefault((kind, apiVersion));
-            if (type == null) {
+            if (!ModelTypes.TryGetValue((kind, apiVersion), out Type type)) {
                 WriteError(new ErrorRecord(new Exception($"Unknown (kind: {kind}, apiVersion: {apiVersion}). {ModelTypes.Count} Known:\n{String.Join("\n", ModelTypes.Keys)}"), null, ErrorCategory.InvalidData, Resource));
                 return;
             }
