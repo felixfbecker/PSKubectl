@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
     <PropertyGroup>
         <TargetFramework>netstandard2.0</TargetFramework>
-        <!-- <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies> -->
+        <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>        <!-- Workaround for NuGet bug to make dotnet build copy NuGet assemblies into bin folder as well: https://github.com/dotnet/sdk/issues/747#issuecomment-419497340 -->
     </PropertyGroup>
     <ItemGroup>
         <!-- <ProjectReference Include="../../../tintoy/dotnet-kube-client/src/KubeClient/KubeClient.csproj" /> -->
@@ -9,7 +9,10 @@
         <PackageReference Include="KubeClient" Version="2.2.14" />
         <PackageReference Include="KubeClient.Extensions.KubeConfig" Version="2.2.14" />
         <PackageReference Include="Microsoft.AspNetCore.JsonPatch" Version="2.1.1" />
-        <PackageReference Include="Microsoft.PowerShell.SDK" Version="6.1.1" />
+        <PackageReference Include="System.Management.Automation" Version="6.1.1">
+            <!-- Inclue all private assets to prevent 'dotnet publish' from publishing all the unneeded DLLs that PowerShell ships with already -->
+            <PrivateAssets>All</PrivateAssets>
+        </PackageReference>
         <!-- <PackageReference Include="Serilog.Extensions.Logging.File" Version="1.1.0" /> -->
         <DotNetCliToolReference Include="MiniCover" Version="2.0.0-ci-20180315091931" />
     </ItemGroup>
