@@ -27,7 +27,6 @@ env:
     - FORCE_COLOR=1
 
 install:
-  - sudo ln -s /usr/bin/pwsh-preview /usr/bin/pwsh
   - dotnet tool install -g dotnet-format --version 3.1.37601
   - pwsh ./ci/Install-Minikube.ps1 -MinikubeVersion v1.2.0 -KubernetesVersion v1.15.0
   - pwsh -c 'Install-Module -Force -Scope CurrentUser PSScriptAnalyzer'
@@ -52,7 +51,6 @@ jobs:
         directories:
           - ~/.npm
       install:
-        - sudo ln -s /usr/bin/pwsh-preview /usr/bin/pwsh
         - nvm install 10
         - nvm use 10
         - npm ci
