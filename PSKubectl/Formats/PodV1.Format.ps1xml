@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8" ?>
 <Configuration>
     <ViewDefinitions>
         <View>
@@ -43,8 +43,9 @@
                                         $reason = $pod.Status.Reason
                                     }
                                     $initializing = $false
+                                    $readyContainers = 0
                                     $i = 0
-                                    foreach ($container in $pod.Status.InitContainerStatuses) {
+                                    foreach ($container in ($pod.Status | ForEach-Object InitContainerStatuses)) {
                                         if ($container.State.Terminated -and $container.State.Terminated.ExitCode -eq 0) {
                                             $i++
                                             continue
