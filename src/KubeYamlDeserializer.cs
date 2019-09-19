@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Management.Automation;
+using KubeClient.Models;
 using Microsoft.Extensions.Logging;
 using YamlDotNet.Serialization;
 using YamlDotNet.Serialization.NamingConventions;
@@ -63,6 +64,18 @@ namespace Kubectl {
                 // e.g. HTTPGetActionV1.Port is officially string but often specified as int
                 // Be tolerant here by trying to cast
                 return Convert.ChangeType(value, type);
+            }
+            if (type == typeof(Int32OrStringV1)) {
+                if (value is int) {
+                    return value;
+                }
+                if (value is string stringValue) {
+                    if (Int32.TryParse(stringValue, out int intValue)) {
+                        return intValue;
+                    }
+                    return stringValue;
+                }
+                throw new Exception($"Invalid type: Expected int or string, got {value.GetType().Name}");
             }
             if (type.IsGenericType) {
                 logger.LogTrace("Is generic");
