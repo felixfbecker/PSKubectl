@@ -92,8 +92,9 @@ namespace Kubectl {
                     logger.LogTrace("Is map");
                     var valueType = type.GetGenericArguments()[1];
                     // Shadowed type is map too
-                    var dict = new Dictionary<string, object>();
+                    var dict = new Hashtable(); // Use non-generic PowerShell hashmap
                     foreach (DictionaryEntry entry in ((IDictionary)value)) {
+                        // Cast key to string because non-string keys are not valid in Kube YAML
                         dict.Add((string)entry.Key, toPSObject(entry.Value, valueType));
                     }
                     return dict;
