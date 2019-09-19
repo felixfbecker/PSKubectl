@@ -4,7 +4,7 @@ Import-Module "$PSScriptRoot/Initialize-TestNamespace.psm1"
 
 Describe Get-KubePod {
 
-    BeforeAll { Initialize-TestNamespace }
+    BeforeAll { Initialize-TestNamespace; Initialize-TestDeployment }
 
     It 'Should return the pods that exist in a namespace' {
         $pods = Get-KubePod -Namespace pskubectltest
@@ -19,7 +19,7 @@ Describe Get-KubePod {
 }
 Describe Remove-KubePod {
 
-    BeforeEach { Initialize-TestNamespace }
+    BeforeEach { Initialize-TestNamespace; Initialize-TestDeployment }
 
     It 'Should delete pods given by wildcard name' {
         $before = Invoke-Executable { kubectl get pods -n pskubectltest -o name }
@@ -80,7 +80,7 @@ Describe Remove-KubePod {
 
 Describe Get-KubeResource {
 
-    BeforeAll { Initialize-TestNamespace }
+    BeforeAll { Initialize-TestNamespace; Initialize-TestDeployment }
 
     It 'Should return pods in a namespace' {
         $pods = Get-KubeResource Pod -Namespace pskubectltest
@@ -97,7 +97,7 @@ Describe Get-KubeResource {
 
 Describe Get-KubeDeployment {
 
-    BeforeAll { Initialize-TestNamespace }
+    BeforeAll { Initialize-TestNamespace; Initialize-TestDeployment }
 
     It 'Should return the deployments that exist in a namespace' {
         $deploy = Get-KubeDeployment -Namespace pskubectltest
@@ -112,7 +112,7 @@ Describe Get-KubeDeployment {
 
 Describe Get-KubeNamespace {
 
-    BeforeAll { Initialize-TestNamespace }
+    BeforeAll { Initialize-TestNamespace; Initialize-TestDeployment }
 
     It 'Should return the deployments that exist in a namespace' {
         $namespaces = Get-KubeNamespace
@@ -122,40 +122,57 @@ Describe Get-KubeNamespace {
 }
 
 Describe Update-KubeResource {
-
     BeforeAll { Initialize-TestNamespace }
 
-    It 'Should update the resource from PSCustomObject pipeline input' {
-        $before = (Invoke-Executable { kubectl get deploy -n pskubectltest -o json } | ConvertFrom-Json).Items
-        $before.Metadata.Annotations.hello | Should -Be 'world'
-        $modified = [pscustomobject]@{
-            Kind = 'Deployment'
-            ApiVersion = 'apps/v1'
-            Metadata = [pscustomobject]@{
-                Name = 'hello-world'
-                Namespace = 'pskubectltest'
-                Annotations = @{
-                    'hello' = 'changed'
+    Describe 'Updating' {
+
+        BeforeAll { Initialize-TestDeployment }
+
+        It 'Should update the resource from PSCustomObject pipeline input' {
+            $before = (Invoke-Executable { kubectl get deploy -n pskubectltest -o json } | ConvertFrom-Json).Items
+            $before.Metadata.Annotations.hello | Should -Be 'world'
+            $modified = [pscustomobject]@{
+                Kind = 'Deployment'
+                ApiVersion = 'apps/v1'
+                Metadata = [pscustomobject]@{
+                    Name = 'hello-world'
+                    Namespace = 'pskubectltest'
+                    Annotations = @{
+                        'hello' = 'changed'
+                    }
                 }
             }
+            $result = $modified | Update-KubeResource
+            $result | Should -Not -BeNullOrEmpty
+            $result | Should -BeOfType KubeClient.Models.DeploymentV1
+            $result.Metadata.Annotations['hello'] | Should -Be 'changed'
+            $after = (Invoke-Executable { kubectl get deploy -n pskubectltest -o json } | ConvertFrom-Json).Items
+            $after.Metadata.Annotations.hello | Should -Be 'changed'
         }
-        $result = $modified | Update-KubeResource
-        $result | Should -Not -BeNullOrEmpty
-        $result | Should -BeOfType KubeClient.Models.DeploymentV1
-        $result.Metadata.Annotations['hello'] | Should -Be 'changed'
-        $after = (Invoke-Executable { kubectl get deploy -n pskubectltest -o json } | ConvertFrom-Json).Items
-        $after.Metadata.Annotations.hello | Should -Be 'changed'
+
+        It 'Should update the resource from a path to a YAML file' {
+            $before = (Invoke-Executable { kubectl get deploy -n pskubectltest -o json } | ConvertFrom-Json).Items
+            $before.Metadata.Annotations['hello'] | Should -Be 'world'
+            $result = Update-KubeResource -Path $PSScriptRoot/modified.Deployment.yml
+            $result | Should -Not -BeNullOrEmpty
+            $result | Should -BeOfType KubeClient.Models.DeploymentV1
+            $result.Metadata.Annotations['hello'] | Should -Be 'changed'
+            $after = (Invoke-Executable { kubectl get deploy -n pskubectltest -o json } | ConvertFrom-Json).Items
+            $after.Metadata.Annotations.hello | Should -Be 'changed'
+        }
     }
 
-    It 'Should update the resource from a path to a YAML file' {
-        $before = (Invoke-Executable { kubectl get deploy -n pskubectltest -o json } | ConvertFrom-Json).Items
-        $before.Metadata.Annotations['hello'] | Should -Be 'world'
-        $result = Update-KubeResource -Path $PSScriptRoot/modified.Deployment.yml -LogPayloads
-        $result | Should -Not -BeNullOrEmpty
-        $result | Should -BeOfType KubeClient.Models.DeploymentV1
-        $result.Metadata.Annotations['hello'] | Should -Be 'changed'
-        $after = (Invoke-Executable { kubectl get deploy -n pskubectltest -o json } | ConvertFrom-Json).Items
-        $after.Metadata.Annotations.hello | Should -Be 'changed'
+    Describe 'Create' {
+        It 'Should create a resource from a path to a YAML file' {
+            $before = (Invoke-Executable { kubectl get deploy -n pskubectltest -o json } | ConvertFrom-Json).Items
+            $before | Should -BeNullOrEmpty
+            $result = Update-KubeResource -Path $PSScriptRoot/test.Deployment.yml
+            $result | Should -Not -BeNullOrEmpty
+            $result | Should -BeOfType KubeClient.Models.DeploymentV1
+            $inputYaml = Get-Content -Raw $PSScriptRoot/test.Deployment.yml
+            $result | ConvertTo-KubeYaml | Should -Be $inputYaml
+            (Invoke-Executable { kubectl get deploy -n pskubectltest -o yaml }) | Should -Be $inputYaml
+        }
     }
 }
 
