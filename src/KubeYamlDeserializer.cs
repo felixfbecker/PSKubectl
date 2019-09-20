@@ -12,7 +12,7 @@ namespace Kubectl {
     public class KubeYamlDeserializer {
         private ILogger logger;
         private Dictionary<(string kind, string apiVersion), Type> modelTypes;
-        private Deserializer deserializer;
+        private IDeserializer deserializer;
 
         public KubeYamlDeserializer(ILogger logger, Dictionary<(string kind, string apiVersion), Type> modelTypes) {
             this.logger = logger;

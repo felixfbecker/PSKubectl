@@ -23,6 +23,10 @@ namespace Kubectl.Cmdlets {
         [ValidateNotNull()]
         public object Resource { get; set; }
 
+        // Needed to take ownership of a resource
+        [Parameter()]
+        public SwitchParameter Force { get; set; }
+
         private KubeYamlDeserializer deserializer;
         private KubeYamlSerializer serializer;
 
@@ -87,6 +91,7 @@ namespace Kubectl.Cmdlets {
                     WriteObject(await client.Dynamic().Apply(
                         resource: (KubeResourceV1)resource,
                         fieldManager: fieldManager,
+                        force: Force,
                         cancellationToken: cancellationToken
                     ));
                 } else {
@@ -97,6 +102,7 @@ namespace Kubectl.Cmdlets {
                         apiVersion: apiVersion,
                         yaml: yaml,
                         fieldManager: fieldManager,
+                        force: Force,
                         kubeNamespace: kubeNamespace,
                         cancellationToken: cancellationToken
                     ));

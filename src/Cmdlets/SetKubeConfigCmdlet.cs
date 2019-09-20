@@ -14,7 +14,7 @@ namespace Kubectl.Cmdlets {
 
         protected override async Task ProcessRecordAsync(CancellationToken cancellationToken) {
             await base.ProcessRecordAsync(cancellationToken);
-            Serializer serializer = new SerializerBuilder().Build();
+            var serializer = new SerializerBuilder().Build();
             string yaml = serializer.Serialize(Config);
             string configPath = K8sConfig.Locate();
             if (ShouldProcess(configPath, "update")) {

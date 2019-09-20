@@ -11,7 +11,7 @@ using YamlDotNet.Serialization.NamingConventions;
 namespace Kubectl {
     public class KubeYamlSerializer {
         private ILogger logger;
-        private Serializer serializer;
+        private ISerializer serializer;
 
         public KubeYamlSerializer(ILogger logger) {
             this.logger = logger;
