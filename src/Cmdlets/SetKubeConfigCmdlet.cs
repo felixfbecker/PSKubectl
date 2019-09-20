@@ -1,14 +1,11 @@
-using System;
-using System.Collections.Generic;
 using System.Management.Automation;
 using System.Threading;
 using System.Threading.Tasks;
 using KubeClient;
 using YamlDotNet.Serialization;
 using System.IO;
-using System.Runtime.InteropServices;
 
-namespace Kubectl {
+namespace Kubectl.Cmdlets {
     [Cmdlet(VerbsCommon.Set, "KubeConfig", SupportsShouldProcess = true)]
     [OutputType(new[] { typeof(K8sConfig) })]
     public sealed class SetKubeConfigCmdlet : AsyncCmdlet {
