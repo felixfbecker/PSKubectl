@@ -22,12 +22,15 @@ Invoke-Executable { chmod +x minikube }
 Invoke-Executable { sudo mv minikube /usr/local/bin/ }
 
 New-Item -ItemType Directory -Path $HOME/.kube, $HOME/.minikube
+New-Item -ItemType File -Path $env:KUBECONFIG
 
 # Start minikube
 Invoke-Executable { sudo minikube start --vm-driver=none --feature-gates=ServerSideApply=true --kubernetes-version=$KubernetesVersion }
 
 Invoke-Executable { sudo chown -R travis: /home/travis/.minikube/ }
 
+# Fix the kubectl context, as it's often stale.
+Invoke-Executable { minikube update-context }
 # Output debug information
 Write-Information "Current context: $(Invoke-Executable { kubectl config current-context })"
 
