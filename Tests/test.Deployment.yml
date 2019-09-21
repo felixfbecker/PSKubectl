@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
       - name: hello-world
-        image: strm/helloworld-http@sha256:bd44b0ca80c26b5eba984bf498a9c3bab0eb1c59d30d8df3cb2c073937ee4e45
+        image: kitematic/hello-world-nginx@sha256:ec0ca6dcb034916784c988b4f2432716e2e92b995ac606e080c7a54b52b87066
         imagePullPolicy: IfNotPresent
         ports:
         - containerPort: 80

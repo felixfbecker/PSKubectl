@@ -169,7 +169,7 @@ Describe Publish-KubeResource {
                             Containers = @(
                                 [PSCustomObject]@{
                                     Name = 'hello-world'
-                                    Image = 'strm/helloworld-http@sha256:bd44b0ca80c26b5eba984bf498a9c3bab0eb1c59d30d8df3cb2c073937ee4e45'
+                                    Image = 'kitematic/hello-world-nginx@sha256:ec0ca6dcb034916784c988b4f2432716e2e92b995ac606e080c7a54b52b87066'
                                     ImagePullPolicy = 'IfNotPresent'
                                     Ports = @(
                                         [PSCustomObject]@{
@@ -260,7 +260,6 @@ Describe Publish-KubeResource {
             $after.spec.replicas | Should -Be 2
             $after.spec.template.metadata.labels.app | Should -Be 'hello-world'
             $after.spec.template.spec.containers[0].name | Should -Be 'hello-world'
-            $after.spec.template.spec.containers[0].image | Should -Be 'strm/helloworld-http@sha256:bd44b0ca80c26b5eba984bf498a9c3bab0eb1c59d30d8df3cb2c073937ee4e45'
             $after.spec.template.spec.containers[0].imagePullPolicy | Should -Be 'IfNotPresent'
             $after.spec.template.spec.containers[0].ports[0].containerPort | Should -Be 80
             $after.spec.template.spec.containers[0].ports[0].protocol | Should -Be 'TCP'
@@ -283,8 +282,8 @@ Describe Get-KubeLog {
     }
 
     It 'Should return the logs of a given pod' {
-        $logs = Get-KubeResource Pod -Namespace pskubectltest -Name hello-world-log-* | Get-KubeLog
-        $logs -split "`n" | Should -Contain 'Hello from Docker!'
+        $logs = Get-KubeResource Pod -Namespace pskubectltest -Name hello-world-* | Select-Object -First 1 | Get-KubeLog
+        $logs.Contains('nginx') | Should -BeTrue
     }
 }
 
