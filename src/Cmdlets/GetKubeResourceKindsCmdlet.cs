@@ -18,7 +18,9 @@ namespace Kubectl.Cmdlets {
                 Kind = pair.kind,
                 ApiVersion = pair.apiVersion
             });
-            WriteObject(kinds);
+            foreach (var kind in kinds) {
+                WriteObject(kind);
+            }
         }
     }
 }

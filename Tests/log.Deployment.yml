@@ -1,22 +1,22 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: log-demo
+  name: hello-world-log
   namespace: pskubectltest
   annotations:
     hello: world
 spec:
   selector:
     matchLabels:
-      app: log-demo
+      app: hello-world-log
   replicas: 2
   template:
     metadata:
       labels:
-        app: log-demo
+        app: hello-world-log
     spec:
       containers:
-      - name: log-demo
+      - name: hello-world-log
         image: hello-world@sha256:b8ba256769a0ac28dd126d584e0a2011cd2877f3f76e093a7ae560f2a5301c00
         imagePullPolicy: IfNotPresent
         ports:

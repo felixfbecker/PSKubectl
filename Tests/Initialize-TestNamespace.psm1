@@ -12,5 +12,6 @@ function Initialize-TestNamespace {
 
 function Initialize-TestDeployment {
     Invoke-Executable { kubectl apply -f $PSScriptRoot/test.Deployment.yml --force --server-side --force-conflicts --wait } | Out-Stream -SuccessTarget 6
+    Invoke-Executable { kubectl apply -f $PSScriptRoot/log.Deployment.yml --force --server-side --force-conflicts --wait } | Out-Stream -SuccessTarget 6
     Invoke-Executable { kubectl rollout status --namespace pskubectltest deploy/hello-world } | Out-Stream -SuccessTarget 6
 }
