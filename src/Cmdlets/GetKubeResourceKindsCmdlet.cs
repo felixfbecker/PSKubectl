@@ -1,13 +1,7 @@
-using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Management.Automation;
 using System.Threading;
 using System.Threading.Tasks;
-using KubeClient;
-using KubeClient.Models;
-using KubeClient.ResourceClients;
-using Microsoft.Extensions.Logging;
 
 namespace Kubectl.Cmdlets {
     [Cmdlet(VerbsCommon.Get, "KubeResourceKinds")]

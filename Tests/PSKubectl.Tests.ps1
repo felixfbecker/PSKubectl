@@ -186,6 +186,19 @@ Describe Publish-KubeResource {
             $after.Metadata.Annotations.hello | Should -Be 'changed'
         }
 
+        It 'Should update the resource from modified Get-KubeResource pipeline input' {
+            $before = (Invoke-Executable { kubectl get deploy -n pskubectltest -o json } | ConvertFrom-Json).Items
+            $before.Metadata.Annotations.hello | Should -Be 'world'
+            $modified = Get-KubeResource -Kind Deployment -Namespace pskubectltest -Name hello-world
+            $modified.Metadata.Annotations['hello'] = 'changed'
+            $result = $modified | Publish-KubeResource
+            $result | Should -Not -BeNullOrEmpty
+            $result | Should -BeOfType KubeClient.Models.DeploymentV1
+            $result.Metadata.Annotations['hello'] | Should -Be 'changed'
+            $after = (Invoke-Executable { kubectl get deploy -n pskubectltest -o json } | ConvertFrom-Json).Items
+            $after.Metadata.Annotations.hello | Should -Be 'changed'
+        }
+
         It 'Should update the resource from a path to a YAML file' {
             $before = (Invoke-Executable { kubectl get deploy -n pskubectltest -o json } | ConvertFrom-Json).Items
             $before.Metadata.Annotations.hello | Should -Be 'world'
@@ -247,6 +260,26 @@ Describe Publish-KubeResource {
             $after.spec.template.spec.containers[0].ports[0].containerPort | Should -Be 80
             $after.spec.template.spec.containers[0].ports[0].protocol | Should -Be 'TCP'
         }
+    }
+}
+
+Describe Get-KubeResourceKinds {
+    It 'Should return resource kinds' {
+        $kinds = Get-KubeResourceKinds | ForEach-Object Kind
+        $kinds | Should -Contain 'Deployment'
+        $kinds | Should -Contain 'Pod'
+    }
+}
+
+Describe Get-KubeLog {
+    BeforeEach {
+        Initialize-TestNamespace
+        Invoke-Executable { kubectl apply -f $PSScriptRoot/log-demo.Deployment.yml }
+    }
+
+    It 'Should return the logs of a given pod' {
+        $logs = Get-KubeResource Pod -Namespace pskubectltest -Name log-demo-* | Get-KubeLog
+        $logs -split "`n" | Should -Contain 'Hello from Docker!'
     }
 }
 
