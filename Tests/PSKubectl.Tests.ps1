@@ -260,3 +260,55 @@ Describe Get-KubeConfig {
         $config.Contexts | Should -Not -BeNullOrEmpty
     }
 }
+
+Describe Convert-KubeYaml {
+    It 'Should read in YAML' {
+        $parsed = Get-Content -Raw $PSScriptRoot/test.Deployment.yml | ConvertFrom-KubeYaml
+        $parsed.PSObject.TypeNames | Should -Contain 'KubeClient.Models.DeploymentV1'
+        $parsed.Metadata.Name | Should -Be 'hello-world'
+        $parsed.Spec.Replicas | Should -Be 2
+    }
+    It 'Should round-trip' {
+        $yaml = Get-Content -Raw $PSScriptRoot/test.Deployment.yml
+        $yaml | ConvertFrom-KubeYaml | ConvertTo-KubeYaml | Should -Be $yaml
+    }
+}
+
+Describe ConvertTo-KubeYaml {
+    BeforeAll {
+        Initialize-TestNamespace
+        Initialize-TestDeployment
+    }
+
+    It 'Should encode PSCustomObjects' {
+        $deploy = [PSCustomObject]@{
+            Kind = 'Deployment'
+            ApiVersion = 'apps/v1'
+            Metadata = [PSCustomObject]@{
+                Name = 'hello-world'
+                Namespace = 'pskubectltest'
+                Annotations = @{
+                    'hello' = 'changed'
+                }
+            }
+        }
+        $yaml = @(
+            'kind: Deployment',
+            'apiVersion: apps/v1',
+            'metadata:',
+            '  name: hello-world',
+            '  namespace: pskubectltest',
+            '  annotations:',
+            '    hello: changed',
+            ''
+        ) -join "`n"
+        $deploy | ConvertTo-KubeYaml | Should -Be $yaml
+    }
+
+    It 'Should encode Get-KubeResource output to YAML' {
+        $parsed = Get-KubeResource -Kind Deployment -Namespace pskubectltest -Name hello-world | ConvertTo-KubeYaml | ConvertFrom-KubeYaml
+        $parsed.Metadata.Name | Should -Be 'hello-world'
+        $parsed.Spec.Replicas | Should -Be 2
+        $parsed.Status.Replicas | Should -Be 2
+    }
+}

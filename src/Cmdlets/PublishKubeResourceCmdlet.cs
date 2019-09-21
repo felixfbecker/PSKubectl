@@ -23,8 +23,7 @@ namespace Kubectl.Cmdlets {
         [ValidateNotNull()]
         public object Resource { get; set; }
 
-        // Needed to take ownership of a resource
-        [Parameter()]
+        [Parameter(HelpMessage = "If present, server-side apply will force the changes against conflicts.")]
         public SwitchParameter Force { get; set; }
 
         private KubeYamlDeserializer deserializer;
