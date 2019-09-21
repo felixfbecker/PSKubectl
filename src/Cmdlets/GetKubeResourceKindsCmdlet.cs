@@ -1,13 +1,7 @@
-using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Management.Automation;
 using System.Threading;
 using System.Threading.Tasks;
-using KubeClient;
-using KubeClient.Models;
-using KubeClient.ResourceClients;
-using Microsoft.Extensions.Logging;
 
 namespace Kubectl.Cmdlets {
     [Cmdlet(VerbsCommon.Get, "KubeResourceKinds")]
@@ -24,7 +18,9 @@ namespace Kubectl.Cmdlets {
                 Kind = pair.kind,
                 ApiVersion = pair.apiVersion
             });
-            WriteObject(kinds);
+            foreach (var kind in kinds) {
+                WriteObject(kind);
+            }
         }
     }
 }

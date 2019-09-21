@@ -7,10 +7,11 @@ function Initialize-TestNamespace {
         throw "Kube context is '$context', expected 'docker-for-desktop' or 'minikube'. Aborting for safety reasons."
     }
     Write-Information 'Setting up Kubernetes cluster'
-    Invoke-Executable { kubectl apply -f $PSScriptRoot/test.Namespace.yml --experimental-server-side --experimental-force-conflicts } | Out-Stream -SuccessTarget 6
+    Invoke-Executable { kubectl apply -f $PSScriptRoot/test.Namespace.yml --server-side --force-conflicts } | Out-Stream -SuccessTarget 6
 }
 
 function Initialize-TestDeployment {
-    Invoke-Executable { kubectl apply -f $PSScriptRoot/test.Deployment.yml --force --experimental-server-side --experimental-force-conflicts --wait } | Out-Stream -SuccessTarget 6
+    Invoke-Executable { kubectl apply -f $PSScriptRoot/test.Deployment.yml --force --server-side --force-conflicts --wait } | Out-Stream -SuccessTarget 6
+    Invoke-Executable { kubectl apply -f $PSScriptRoot/log.Deployment.yml --force --server-side --force-conflicts --wait } | Out-Stream -SuccessTarget 6
     Invoke-Executable { kubectl rollout status --namespace pskubectltest deploy/hello-world } | Out-Stream -SuccessTarget 6
 }

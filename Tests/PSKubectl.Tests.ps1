@@ -8,12 +8,11 @@ Describe Get-KubePod {
 
     It 'Should return the pods that exist in a namespace' {
         $pods = Get-KubePod -Namespace pskubectltest
-        $pods.Count | Should -Not -BeNullOrEmpty
+        $pods | Should -Not -BeNullOrEmpty
         $pods | ForEach-Object {
             $_ | Should -BeOfType KubeClient.Models.PodV1
             $_.Name | Should -BeLike 'hello-world-*'
             $_.Namespace | Should -Be 'pskubectltest'
-            $_.Status.Phase | Should -Be 'Running'
         }
     }
 }
@@ -92,6 +91,12 @@ Describe Get-KubeResource {
             $_.Status.Phase | Should -Be 'Running'
         }
     }
+
+    It 'Should return deployment by name' {
+        $deploy = Get-KubeResource Deployment -Namespace pskubectltest -Name hello-world
+        $deploy | Should -HaveCount 1
+        $deploy.Metadata.Name | Should -Be 'hello-world'
+    }
 }
 
 
@@ -101,12 +106,12 @@ Describe Get-KubeDeployment {
 
     It 'Should return the deployments that exist in a namespace' {
         $deploy = Get-KubeDeployment -Namespace pskubectltest
-        $deploy | Should -HaveCount 1
+        $deploy | Should -Not -BeNullOrEmpty
         $deploy | Should -BeOfType KubeClient.Models.DeploymentV1
-        $deploy.Name | Should -Be 'hello-world'
-        $deploy.Namespace | Should -Be 'pskubectltest'
-        $deploy.Desired | Should -Be 2
-        $deploy.Current | Should -Be 2
+        $helloWorld = $deploy | Where-Object { $_.Name -eq 'hello-world' }
+        $helloWorld | Should -Not -BeNullOrEmpty
+        $helloWorld.Name | Should -Be 'hello-world'
+        $helloWorld.Namespace | Should -Be 'pskubectltest'
     }
 }
 
@@ -135,7 +140,7 @@ Describe Publish-KubeResource {
         }
 
         It 'Should update the resource from PSCustomObject pipeline input' {
-            $before = (Invoke-Executable { kubectl get deploy -n pskubectltest -o json } | ConvertFrom-Json).Items
+            $before = (Invoke-Executable { kubectl get deploy hello-world -n pskubectltest -o json } | ConvertFrom-Json)
             $before.Metadata.Annotations.hello | Should -Be 'world'
             $modified = [PSCustomObject]@{
                 Kind = 'Deployment'
@@ -182,18 +187,31 @@ Describe Publish-KubeResource {
             $result | Should -Not -BeNullOrEmpty
             $result | Should -BeOfType KubeClient.Models.DeploymentV1
             $result.Metadata.Annotations['hello'] | Should -Be 'changed'
-            $after = (Invoke-Executable { kubectl get deploy -n pskubectltest -o json } | ConvertFrom-Json).Items
+            $after = (Invoke-Executable { kubectl get deploy hello-world -n pskubectltest -o json } | ConvertFrom-Json)
+            $after.Metadata.Annotations.hello | Should -Be 'changed'
+        }
+
+        It -Skip 'Should update the resource from modified Get-KubeResource pipeline input' {
+            $before = (Invoke-Executable { kubectl get deploy hello-world -n pskubectltest -o json } | ConvertFrom-Json)
+            $before.Metadata.Annotations.hello | Should -Be 'world'
+            $modified = Get-KubeResource -Kind Deployment -Namespace pskubectltest -Name hello-world
+            $modified.Metadata.Annotations['hello'] = 'changed'
+            $result = $modified | Publish-KubeResource
+            $result | Should -Not -BeNullOrEmpty
+            $result | Should -BeOfType KubeClient.Models.DeploymentV1
+            $result.Metadata.Annotations['hello'] | Should -Be 'changed'
+            $after = (Invoke-Executable { kubectl get deploy hello-world -n pskubectltest -o json } | ConvertFrom-Json)
             $after.Metadata.Annotations.hello | Should -Be 'changed'
         }
 
         It 'Should update the resource from a path to a YAML file' {
-            $before = (Invoke-Executable { kubectl get deploy -n pskubectltest -o json } | ConvertFrom-Json).Items
+            $before = (Invoke-Executable { kubectl get deploy hello-world -n pskubectltest -o json } | ConvertFrom-Json)
             $before.Metadata.Annotations.hello | Should -Be 'world'
             $result = Publish-KubeResource -Path $PSScriptRoot/modified.Deployment.yml
             $result | Should -Not -BeNullOrEmpty
             $result | Should -BeOfType KubeClient.Models.DeploymentV1
             $result.Metadata.Annotations['hello'] | Should -Be 'changed'
-            $after = (Invoke-Executable { kubectl get deploy -n pskubectltest -o json } | ConvertFrom-Json).Items
+            $after = (Invoke-Executable { kubectl get deploy hello-world -n pskubectltest -o json } | ConvertFrom-Json)
             $after.Metadata.Annotations.hello | Should -Be 'changed'
         }
     }
@@ -212,7 +230,7 @@ Describe Publish-KubeResource {
             Invoke-Executable { kubectl create -f $PSScriptRoot/test.Deployment.yml }
             Invoke-Executable { kubectl rollout status --namespace pskubectltest deploy/hello-world } | Out-Stream -SuccessTarget 6
 
-            $before = (Invoke-Executable { kubectl get deploy -n pskubectltest -o json } | ConvertFrom-Json).Items
+            $before = (Invoke-Executable { kubectl get deploy hello-world -n pskubectltest -o json } | ConvertFrom-Json)
             $before.Metadata.Annotations.hello | Should -Be 'world'
 
             $result = Publish-KubeResource -Path $PSScriptRoot/modified.Deployment.yml -Force
@@ -220,7 +238,7 @@ Describe Publish-KubeResource {
             $result | Should -BeOfType KubeClient.Models.DeploymentV1
             $result.Metadata.Annotations.hello | Should -Be 'changed'
 
-            $after = (Invoke-Executable { kubectl get deploy -n pskubectltest -o json } | ConvertFrom-Json).Items
+            $after = (Invoke-Executable { kubectl get deploy hello-world -n pskubectltest -o json } | ConvertFrom-Json)
             $after.Metadata.Annotations.hello | Should -Be 'changed'
         }
     }
@@ -235,7 +253,7 @@ Describe Publish-KubeResource {
             $result | Should -Not -BeNullOrEmpty
             $result | Should -BeOfType KubeClient.Models.DeploymentV1
 
-            $after = (Invoke-Executable { kubectl get deploy -n pskubectltest -o json } | ConvertFrom-Json).Items
+            $after = (Invoke-Executable { kubectl get deploy -n pskubectltest -o json hello-world } | ConvertFrom-Json)
             $after.metadata.name | Should -Be 'hello-world'
             $after.metadata.annotations.hello | Should -Be 'world'
             $after.spec.selector.matchLabels.app | Should -Be 'hello-world'
@@ -250,6 +268,26 @@ Describe Publish-KubeResource {
     }
 }
 
+Describe Get-KubeResourceKinds {
+    It 'Should return resource kinds' {
+        $kinds = Get-KubeResourceKinds | ForEach-Object Kind
+        $kinds | Should -Contain 'Deployment'
+        $kinds | Should -Contain 'Pod'
+    }
+}
+
+Describe Get-KubeLog {
+    BeforeEach {
+        Initialize-TestNamespace
+        Initialize-TestDeployment
+    }
+
+    It 'Should return the logs of a given pod' {
+        $logs = Get-KubeResource Pod -Namespace pskubectltest -Name hello-world-log-* | Get-KubeLog
+        $logs -split "`n" | Should -Contain 'Hello from Docker!'
+    }
+}
+
 Describe Get-KubeConfig {
 
     It 'Should return kube configuration' {
@@ -258,5 +296,57 @@ Describe Get-KubeConfig {
         $config.CurrentContext | Should -Not -BeNullOrEmpty
         $config.Clusters | Should -Not -BeNullOrEmpty
         $config.Contexts | Should -Not -BeNullOrEmpty
+    }
+}
+
+Describe Convert-KubeYaml {
+    It 'Should read in YAML' {
+        $parsed = Get-Content -Raw $PSScriptRoot/test.Deployment.yml | ConvertFrom-KubeYaml
+        $parsed.PSObject.TypeNames | Should -Contain 'KubeClient.Models.DeploymentV1'
+        $parsed.Metadata.Name | Should -Be 'hello-world'
+        $parsed.Spec.Replicas | Should -Be 2
+    }
+    It 'Should round-trip' {
+        $yaml = Get-Content -Raw $PSScriptRoot/test.Deployment.yml
+        $yaml | ConvertFrom-KubeYaml | ConvertTo-KubeYaml | Should -Be $yaml
+    }
+}
+
+Describe ConvertTo-KubeYaml {
+    BeforeAll {
+        Initialize-TestNamespace
+        Initialize-TestDeployment
+    }
+
+    It 'Should encode PSCustomObjects' {
+        $deploy = [PSCustomObject]@{
+            Kind = 'Deployment'
+            ApiVersion = 'apps/v1'
+            Metadata = [PSCustomObject]@{
+                Name = 'hello-world'
+                Namespace = 'pskubectltest'
+                Annotations = @{
+                    'hello' = 'changed'
+                }
+            }
+        }
+        $yaml = @(
+            'kind: Deployment',
+            'apiVersion: apps/v1',
+            'metadata:',
+            '  name: hello-world',
+            '  namespace: pskubectltest',
+            '  annotations:',
+            '    hello: changed',
+            ''
+        ) -join "`n"
+        $deploy | ConvertTo-KubeYaml | Should -Be $yaml
+    }
+
+    It 'Should encode Get-KubeResource output to YAML' {
+        $parsed = Get-KubeResource -Kind Deployment -Namespace pskubectltest -Name hello-world | ConvertTo-KubeYaml | ConvertFrom-KubeYaml
+        $parsed.Metadata.Name | Should -Be 'hello-world'
+        $parsed.Spec.Replicas | Should -Be 2
+        $parsed.Status.Replicas | Should -Be 2
     }
 }
