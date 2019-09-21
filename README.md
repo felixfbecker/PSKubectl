@@ -36,7 +36,7 @@ There are also specialised cmdlets for common kinds like `Get-KubePod` and `Get-
 Equivalent to `kubectl logs`. Pass `-Follow` to stream logs.
 The cmdlet accepts pipeline input from `Get-KubePod`.
 
-#### `Update-KubeResource`
+#### `Publish-KubeResource`
 
 Equivalent to `kubectl apply`.
 Takes Kubernetes objects or YAML file paths as pipeline or parameter input and sends them to the server to apply the difference.
@@ -56,8 +56,8 @@ Pass `-Force` to resolve the conflict in these cases.
 Example:
 
 ```powershell
-Update-KubeResource *.yml
-Get-ChildItem *.yml -Recurse | Update-KubeResource
+Publish-KubeResource *.yml
+Get-ChildItem *.yml -Recurse | Publish-KubeResource
 ```
 
 Editing a field before updating:
@@ -67,7 +67,7 @@ Get-ChildItem *.Deployment.yml -Recurse |
     Get-Content -Raw |
     ConvertFrom-KubeYaml |
     ForEach-Object { $_.Spec.Template.Spec.Containers[0].Image = $newImage; $_ } |
-    Update-KubeResource
+    Publish-KubeResource
 ```
 
 #### `ConvertFrom-KubeYaml`
@@ -80,7 +80,7 @@ Other cmdlets take these objects as input.
 
 Compare two Kubernetes objects and output a JSON Patch.
 
-Example that replicates the logic of `Update-KubeResource`:
+Example that replicates the logic of `Publish-KubeResource`:
 
 ```powershell
 $modified = Get-Content -Raw deployment.yml | ConvertFrom-KubeYaml

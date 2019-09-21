@@ -121,7 +121,7 @@ Describe Get-KubeNamespace {
     }
 }
 
-Describe Update-KubeResource {
+Describe Publish-KubeResource {
     BeforeAll { Initialize-TestNamespace }
     BeforeEach {
         # Delete everything for each test to make sure field managers are not messed up.
@@ -178,7 +178,7 @@ Describe Update-KubeResource {
                     }
                 }
             }
-            $result = $modified | Update-KubeResource
+            $result = $modified | Publish-KubeResource
             $result | Should -Not -BeNullOrEmpty
             $result | Should -BeOfType KubeClient.Models.DeploymentV1
             $result.Metadata.Annotations['hello'] | Should -Be 'changed'
@@ -189,7 +189,7 @@ Describe Update-KubeResource {
         It 'Should update the resource from a path to a YAML file' {
             $before = (Invoke-Executable { kubectl get deploy -n pskubectltest -o json } | ConvertFrom-Json).Items
             $before.Metadata.Annotations.hello | Should -Be 'world'
-            $result = Update-KubeResource -Path $PSScriptRoot/modified.Deployment.yml
+            $result = Publish-KubeResource -Path $PSScriptRoot/modified.Deployment.yml
             $result | Should -Not -BeNullOrEmpty
             $result | Should -BeOfType KubeClient.Models.DeploymentV1
             $result.Metadata.Annotations['hello'] | Should -Be 'changed'
@@ -205,7 +205,7 @@ Describe Update-KubeResource {
         It 'Should fail with a Conflict error if it was with kubectl create or client-side apply before' {
             Invoke-Executable { kubectl create -f $PSScriptRoot/test.Deployment.yml }
             Invoke-Executable { kubectl rollout status --namespace pskubectltest deploy/hello-world } | Out-Stream -SuccessTarget 6
-            { Update-KubeResource -Path $PSScriptRoot/modified.Deployment.yml } | Should -Throw "Conflict"
+            { Publish-KubeResource -Path $PSScriptRoot/modified.Deployment.yml } | Should -Throw "Conflict"
         }
 
         It 'Should update the resource if it was updated before with kubectl create or client-side apply and -Force was given' {
@@ -215,7 +215,7 @@ Describe Update-KubeResource {
             $before = (Invoke-Executable { kubectl get deploy -n pskubectltest -o json } | ConvertFrom-Json).Items
             $before.Metadata.Annotations.hello | Should -Be 'world'
 
-            $result = Update-KubeResource -Path $PSScriptRoot/modified.Deployment.yml -Force
+            $result = Publish-KubeResource -Path $PSScriptRoot/modified.Deployment.yml -Force
             $result | Should -Not -BeNullOrEmpty
             $result | Should -BeOfType KubeClient.Models.DeploymentV1
             $result.Metadata.Annotations.hello | Should -Be 'changed'
@@ -231,7 +231,7 @@ Describe Update-KubeResource {
             $before = (Invoke-Executable { kubectl get deploy -n pskubectltest -o json } | ConvertFrom-Json).Items
             $before | Should -BeNullOrEmpty
 
-            $result = Update-KubeResource -Path $PSScriptRoot/test.Deployment.yml
+            $result = Publish-KubeResource -Path $PSScriptRoot/test.Deployment.yml
             $result | Should -Not -BeNullOrEmpty
             $result | Should -BeOfType KubeClient.Models.DeploymentV1
 

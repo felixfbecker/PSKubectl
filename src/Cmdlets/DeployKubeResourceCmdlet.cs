@@ -8,9 +8,9 @@ using KubeClient.Models;
 using Microsoft.Extensions.Logging;
 
 namespace Kubectl.Cmdlets {
-    [Cmdlet(VerbsData.Update, "KubeResource", SupportsShouldProcess = true)]
+    [Cmdlet(VerbsData.Publish, "KubeResource", SupportsShouldProcess = true)]
     [OutputType(new[] { typeof(KubeResourceV1) })]
-    public sealed class UpdateKubeResourceCmdlet : KubeApiCmdlet {
+    public sealed class DeployKubeResourceCmdlet : KubeApiCmdlet {
         private static readonly string fieldManager = "kubectl";
 
         [Parameter(Mandatory = true, Position = 0, ParameterSetName = "Path", ValueFromPipelineByPropertyName = true)]

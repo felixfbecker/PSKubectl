@@ -102,7 +102,7 @@
         'Get-KubeResourceKinds',
         'Remove-KubePod',
         'Set-KubeConfig',
-        'Update-KubeResource',
+        'Publish-KubeResource',
         'Use-KubeContext'
     )
 
