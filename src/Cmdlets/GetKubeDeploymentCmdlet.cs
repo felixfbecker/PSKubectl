@@ -15,7 +15,7 @@ namespace Kubectl.Cmdlets {
     public sealed class GetKubeDeploymentCmdlet : KubeApiCmdlet {
         [Parameter(ValueFromPipelineByPropertyName = true)]
         [Alias("Ns")]
-        public string Namespace { get; set; }
+        public string Namespace { get; set; } = "default";
 
         [Parameter()]
         public string LabelSelector { get; set; }

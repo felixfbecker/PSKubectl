@@ -2,11 +2,20 @@ using namespace System.Management.Automation.Language;
 using namespace System.Management.Automation;
 
 $podNameCompleter = {
-    param([string]$commandName, [string]$parameterName, [string]$wordToComplete, [CommandAst]$commandAst, [Hashtable]$fakeBoundParameter)
+    param([string]$commandName, [string]$parameterName, [string]$wordToComplete, [CommandAst]$commandAst, [Hashtable]$params)
 
-    $fakeBoundParameter.Remove('Name')
+    $podParams = @{ }
+    if ($params.ContainsKey('ApiEndpoint')) {
+        $podParams.ApiEndpoint = $params.ApiEndpoint
+    }
+    if ($params.ContainsKey('AllowInsecure')) {
+        $podParams.AllowInsecure = $params.AllowInsecure
+    }
+    if ($params.ContainsKey('Namespace')) {
+        $podParams.Namespace = $params.Namespace
+    }
 
-    Get-KubePod @fakeBoundParameter |
+    Get-KubePod @podParams |
         ForEach-Object { $_.Metadata.Name } |
         Where-Object { $_ -like "$wordToComplete*" } |
         ForEach-Object { [CompletionResult]::new($_, $_, [CompletionResultType]::ParameterValue, $_) }
