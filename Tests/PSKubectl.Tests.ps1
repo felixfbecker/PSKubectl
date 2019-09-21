@@ -13,7 +13,6 @@ Describe Get-KubePod {
             $_ | Should -BeOfType KubeClient.Models.PodV1
             $_.Name | Should -BeLike 'hello-world-*'
             $_.Namespace | Should -Be 'pskubectltest'
-            $_.Status.Phase | Should -Be 'Running'
         }
     }
 }
