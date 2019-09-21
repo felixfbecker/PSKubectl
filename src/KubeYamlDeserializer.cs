@@ -12,7 +12,7 @@ namespace Kubectl {
     public class KubeYamlDeserializer {
         private ILogger logger;
         private Dictionary<(string kind, string apiVersion), Type> modelTypes;
-        private Deserializer deserializer;
+        private IDeserializer deserializer;
 
         public KubeYamlDeserializer(ILogger logger, Dictionary<(string kind, string apiVersion), Type> modelTypes) {
             this.logger = logger;
@@ -23,14 +23,18 @@ namespace Kubectl {
                 .Build();
         }
 
+        /// <summary>
+        /// Deserializes the given Kubernetes resource YAML string to PSObjects
+        /// with type names, Dictionaries and Lists depending on the kind of the
+        /// resource and its schema.
+        /// </summary>
         public object Deserialize(string yaml) {
             if (yaml == null) throw new ArgumentNullException(nameof(yaml));
 
             // Deserialize to Dictionary first to check the kind field to determine the type
             Dictionary<string, object> dict = deserializer.Deserialize<Dictionary<string, object>>(yaml);
             string kind = (string)dict["kind"];
-            string apiGroupVersion = (string)dict["apiVersion"];
-            string apiVersion = apiGroupVersion.Split('/').Last();
+            string apiVersion = (string)dict["apiVersion"];
             logger.LogDebug($"apiVersion {apiVersion}");
             if (!modelTypes.TryGetValue((kind, apiVersion), out Type type)) {
                 throw new Exception($"Unknown (kind: {kind}, apiVersion: {apiVersion}). {modelTypes.Count} Known:\n{String.Join("\n", modelTypes.Keys)}");
@@ -88,8 +92,9 @@ namespace Kubectl {
                     logger.LogTrace("Is map");
                     var valueType = type.GetGenericArguments()[1];
                     // Shadowed type is map too
-                    var dict = new Dictionary<string, object>();
+                    var dict = new Hashtable(); // Use non-generic PowerShell hashmap
                     foreach (DictionaryEntry entry in ((IDictionary)value)) {
+                        // Cast key to string because non-string keys are not valid in Kube YAML
                         dict.Add((string)entry.Key, toPSObject(entry.Value, valueType));
                     }
                     return dict;

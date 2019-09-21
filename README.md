@@ -39,17 +39,29 @@ The cmdlet accepts pipeline input from `Get-KubePod`.
 #### `Update-KubeResource`
 
 Equivalent to `kubectl apply`.
-Takes Kubernetes objects or YAML file paths as pipeline or parameter input, compares them with the state of that object on the server, generates a three-way patch and sends it to the server.
+Takes Kubernetes objects or YAML file paths as pipeline or parameter input and sends them to the server to apply the difference.
 Supports `-WhatIf` and `-Confirm`.
 Prints the updated object returned by the server.
 
+**Important:** This uses a new beta feature of Kubernetes, server-side apply, which needs to be enabled on the server.
+This is safer and avoids reverse-engineering the client-side apply algorithm used currently by `kubectl`.
+Soon, `kubectl` will also do server-side applys by default.
+While the feature is in beta, you need to start the Kubernetes server with `--feature-gates=ServerSideApply=true`.
+
+In opposite to client-side apply, server-side apply will fail with a conflict error
+if any of touched the fields were updated before by a different field manager,
+or overridden with a client-side apply or edit.
+Pass `-Force` to resolve the conflict in these cases.
+
 Example:
+
 ```powershell
 Update-KubeResource *.yml
 Get-ChildItem *.yml -Recurse | Update-KubeResource
 ```
 
 Editing a field before updating:
+
 ```powershell
 Get-ChildItem *.Deployment.yml -Recurse |
     Get-Content -Raw |
@@ -69,6 +81,7 @@ Other cmdlets take these objects as input.
 Compare two Kubernetes objects and output a JSON Patch.
 
 Example that replicates the logic of `Update-KubeResource`:
+
 ```powershell
 $modified = Get-Content -Raw deployment.yml | ConvertFrom-KubeYaml
 $original = $modified | Get-KubeDeployment

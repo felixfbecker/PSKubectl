@@ -4,7 +4,7 @@ metadata:
   name: hello-world
   namespace: pskubectltest
   annotations:
-    hello: world
+    hello: changed
 spec:
   selector:
     matchLabels:

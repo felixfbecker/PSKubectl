@@ -1,24 +1,18 @@
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Management.Automation;
-using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using KubeClient;
 using KubeClient.Models;
-using KubeClient.ResourceClients;
-using Microsoft.AspNetCore.JsonPatch;
-using Microsoft.AspNetCore.JsonPatch.Operations;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-using Newtonsoft.Json.Serialization;
+using Microsoft.Extensions.Logging;
 
 namespace Kubectl.Cmdlets {
     [Cmdlet(VerbsData.Update, "KubeResource", SupportsShouldProcess = true)]
     [OutputType(new[] { typeof(KubeResourceV1) })]
     public sealed class UpdateKubeResourceCmdlet : KubeApiCmdlet {
+        private static readonly string fieldManager = "kubectl";
+
         [Parameter(Mandatory = true, Position = 0, ParameterSetName = "Path", ValueFromPipelineByPropertyName = true)]
         [Alias("FullName")]
         [ValidateNotNullOrEmpty()]
@@ -29,15 +23,29 @@ namespace Kubectl.Cmdlets {
         [ValidateNotNull()]
         public object Resource { get; set; }
 
+        // Needed to take ownership of a resource
+        [Parameter()]
+        public SwitchParameter Force { get; set; }
+
+        private KubeYamlDeserializer deserializer;
+        private KubeYamlSerializer serializer;
+
+        protected override async Task BeginProcessingAsync(CancellationToken cancellationToken) {
+            await base.BeginProcessingAsync(cancellationToken);
+
+            deserializer = new KubeYamlDeserializer(Logger, ModelTypes);
+            serializer = new KubeYamlSerializer(Logger);
+        }
+
         protected override async Task ProcessRecordAsync(CancellationToken cancellationToken) {
             await base.ProcessRecordAsync(cancellationToken);
 
             if (Path == null) {
                 // Object given
-                await updateResource(Resource, cancellationToken);
+                var yaml = Resource is KubeResourceV1 ? null : serializer.Serialize(Resource);
+                await updateResource(Resource, yaml, cancellationToken);
             } else {
                 // File path given
-                var deserializer = new KubeYamlDeserializer(Logger, ModelTypes);
                 ProviderInfo provider;
                 // Resolve wildcards
                 var paths = GetResolvedProviderPathFromPSPath(Path, out provider);
@@ -47,67 +55,58 @@ namespace Kubectl.Cmdlets {
                     using (var streamReader = File.OpenText(path)) {
                         yaml = await streamReader.ReadToEndAsync();
                     }
-                    var modified = deserializer.Deserialize(yaml);
-                    await updateResource(modified, cancellationToken);
+                    var resource = deserializer.Deserialize(yaml);
+                    await updateResource(resource, yaml, cancellationToken);
                 }
             }
         }
 
-        private async Task updateResource(dynamic modified, CancellationToken cancellationToken) {
-            if (modified == null) throw new ArgumentNullException(nameof(modified));
+        private async Task updateResource(object resource, string yaml, CancellationToken cancellationToken) {
+            if (resource == null) throw new ArgumentNullException(nameof(resource));
 
-            string kind = (string)modified.Kind;
+            string kind = (string)resource.GetDynamicPropertyValue("Kind");
             if (String.IsNullOrEmpty(kind)) {
                 throw new Exception("Input object does not have Kind set");
             }
-            string apiVersion = (string)modified.ApiVersion;
+            string apiVersion = (string)resource.GetDynamicPropertyValue("ApiVersion");
             if (String.IsNullOrEmpty(apiVersion)) {
                 throw new Exception("Input object does not have ApiVersion set");
             }
+            Logger.LogTrace($"ApiVersion {apiVersion}");
 
-            // Figure out the model class - needed for diffing
-            if (!ModelTypes.TryGetValue((kind, apiVersion), out Type type)) {
-                WriteError(new ErrorRecord(new Exception($"Unknown (kind: {kind}, apiVersion: {apiVersion}). {ModelTypes.Count} Known:\n{String.Join("\n", ModelTypes.Keys)}"), null, ErrorCategory.InvalidData, Resource));
-                return;
+            object metadata = resource.GetDynamicPropertyValue("Metadata");
+            if (metadata == null) {
+                throw new Exception("Input object does not have Metadata set");
             }
-
-            dynamic metadata = modified.Metadata;
-            string name = (string)metadata.Name;
+            string name = (string)metadata.GetDynamicPropertyValue("Name");
             if (String.IsNullOrEmpty(name)) {
                 throw new Exception("Input object does not have Metadata.Name set");
             }
-            string kubeNamespace = (string)metadata.Namespace;
+            string kubeNamespace = (string)metadata.GetDynamicPropertyValue("Namespace");
 
-            // Get current resource state from server
-            WriteVerbose($"Getting resource \"{name}\" of kind \"{kind}\" from namespace \"{kubeNamespace}\"");
-            object current = await client.Dynamic().Get(name, kind, apiVersion, kubeNamespace, cancellationToken);
-            if (current == null) {
-                WriteError(new ErrorRecord(new Exception($"{kind} ({apiVersion}) \"{name}\" does not exist in namespace \"{kubeNamespace}\""), null, ErrorCategory.InvalidData, Resource));
-                return;
-            }
-
-            // Generate three-way patch from current to modified
-            // TODO do not pass the ContractResolver here once KubeClient allows customizing the serialisation
-            var patch = new JsonPatchDocument(new List<Operation>(), new PSObjectAwareContractResolver());
-            var comparer = new KubeResourceComparer(LoggerFactory);
-            comparer.CreateThreeWayPatchFromLastApplied(current, modified, type, patch, true);
-
-            WriteVerbose("Patch: " + JsonConvert.SerializeObject(patch, new JsonSerializerSettings {
-                Formatting = Formatting.Indented,
-                Converters = new[] { new PSObjectJsonConverter() }
-            }));
-
-            // Send patch to server
-            if (ShouldProcess($"Sending patch for {kind} \"{name}\" in namespace \"{kubeNamespace}\"", $"Send patch for {kind} \"{name}\" in namespace \"{kubeNamespace}\"?", "Confirm")) {
-                var result = await client.Dynamic().Patch(
-                    name: name,
-                    kind: kind,
-                    apiVersion: apiVersion,
-                    patch: patch,
-                    kubeNamespace: kubeNamespace,
-                    cancellationToken: cancellationToken
-                );
-                WriteObject(result);
+            // Send to server
+            if (ShouldProcess($"Apply {kind} \"{name}\" in namespace \"{kubeNamespace}\"", $"Apply {kind} \"{name}\" in namespace \"{kubeNamespace}\"?", "Confirm")) {
+                if (resource is KubeResourceV1 res) {
+                    Logger.LogTrace("Sending KubeResourceV1 object");
+                    WriteObject(await client.Dynamic().Apply(
+                        resource: (KubeResourceV1)resource,
+                        fieldManager: fieldManager,
+                        force: Force,
+                        cancellationToken: cancellationToken
+                    ));
+                } else {
+                    Logger.LogTrace("Sending raw YAML");
+                    WriteObject(await client.Dynamic().ApplyYaml(
+                        name: name,
+                        kind: kind,
+                        apiVersion: apiVersion,
+                        yaml: yaml,
+                        fieldManager: fieldManager,
+                        force: Force,
+                        kubeNamespace: kubeNamespace,
+                        cancellationToken: cancellationToken
+                    ));
+                }
             }
         }
     }
