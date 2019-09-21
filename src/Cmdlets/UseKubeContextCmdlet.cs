@@ -1,12 +1,9 @@
-using System;
-using System.Collections.Generic;
 using System.Management.Automation;
 using System.Threading;
 using System.Threading.Tasks;
 using KubeClient;
 using YamlDotNet.Serialization;
 using System.IO;
-using System.Runtime.InteropServices;
 
 namespace Kubectl.Cmdlets {
     [Cmdlet(VerbsOther.Use, "KubeContext")]
@@ -22,10 +19,12 @@ namespace Kubectl.Cmdlets {
             string configPath = K8sConfig.Locate();
             K8sConfig config = K8sConfig.Load(configPath);
             config.CurrentContextName = Context;
-            Serializer serializer = new SerializerBuilder().Build();
+            ISerializer serializer = new SerializerBuilder().Build();
             string yaml = serializer.Serialize(config);
             if (ShouldProcess(configPath, "update")) {
-                await File.WriteAllTextAsync(configPath, yaml); // Do not pass cancellationToken to not corrupt config file
+                using (var streamWriter = new StreamWriter(configPath)) {
+                    await streamWriter.WriteAsync(yaml); // Do not pass cancellationToken to not corrupt config file
+                }
             }
         }
     }

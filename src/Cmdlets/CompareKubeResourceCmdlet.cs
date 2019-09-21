@@ -49,8 +49,7 @@ namespace Kubectl.Cmdlets {
             string apiGroupVersion = (string)Original.ApiVersion;
             string apiVersion = apiGroupVersion.Split('/').Last();
             string kind = (string)Original.Kind;
-            Type type = ModelTypes.GetValueOrDefault((kind, apiVersion));
-            if (type == null) {
+            if (!ModelTypes.TryGetValue((kind, apiVersion), out Type type)) {
                 WriteError(new ErrorRecord(new Exception($"Unknown (kind: {kind}, apiVersion: {apiVersion}). {ModelTypes.Count} Known:\n{String.Join("\n", ModelTypes.Keys)}"), null, ErrorCategory.InvalidData, null));
                 return;
             }

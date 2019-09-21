@@ -3,4 +3,7 @@
   "powershell.codeFormatting.alignPropertyValuePairs": false,
   "powershell.codeFormatting.newLineAfterCloseBrace": false,
   "editor.formatOnSave": true,
+  "[yaml]": {
+    "editor.formatOnSave": false
+  }
 }

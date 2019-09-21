@@ -2,12 +2,17 @@ using namespace System.Management.Automation.Language;
 using namespace System.Management.Automation;
 
 $namespaceCompleter = {
-    param([string]$commandName, [string]$parameterName, [string]$wordToComplete, [CommandAst]$commandAst, [Hashtable]$fakeBoundParameter)
+    param([string]$commandName, [string]$parameterName, [string]$wordToComplete, [CommandAst]$commandAst, [Hashtable]$params)
 
-    $fakeBoundParameter.Remove('Namespace')
-    $fakeBoundParameter.Remove('Name')
+    $nsParams = @{ }
+    if ($params.ContainsKey('ApiEndpoint')) {
+        $nsParams.ApiEndpoint = $params.ApiEndpoint
+    }
+    if ($params.ContainsKey('AllowInsecure')) {
+        $nsParams.AllowInsecure = $params.AllowInsecure
+    }
 
-    Get-KubeNamespace @fakeBoundParameter |
+    Get-KubeNamespace @nsParams |
         ForEach-Object { $_.Metadata.Name } |
         Where-Object { $_ -like "$wordToComplete*" } |
         ForEach-Object { [CompletionResult]::new($_, $_, [CompletionResultType]::ParameterValue, $_) }

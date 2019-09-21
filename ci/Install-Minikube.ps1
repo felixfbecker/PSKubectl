@@ -1,5 +1,4 @@
 param(
-    [Parameter(Mandatory)][string]$KubectlVersion,
     [Parameter(Mandatory)][string]$MinikubeVersion,
     [Parameter(Mandatory)][string]$KubernetesVersion
 )
@@ -13,7 +12,7 @@ Import-Module "$PSScriptRoot/../Tests/Invoke-Executable.psm1"
 $env:CHANGE_MINIKUBE_NONE_USER = 'true'
 
 # Download kubectl, which is a requirement for using minikube.
-Invoke-WebRequest -OutFile kubectl -Uri "https://storage.googleapis.com/kubernetes-release/release/$KubectlVersion/bin/linux/amd64/kubectl"
+Invoke-WebRequest -OutFile kubectl -Uri "https://storage.googleapis.com/kubernetes-release/release/$KubernetesVersion/bin/linux/amd64/kubectl"
 Invoke-Executable { chmod +x kubectl }
 Invoke-Executable { sudo mv kubectl /usr/local/bin/ }
 
@@ -21,7 +20,14 @@ Invoke-Executable { sudo mv kubectl /usr/local/bin/ }
 Invoke-WebRequest -OutFile minikube -Uri "https://storage.googleapis.com/minikube/releases/$MinikubeVersion/minikube-linux-amd64"
 Invoke-Executable { chmod +x minikube }
 Invoke-Executable { sudo mv minikube /usr/local/bin/ }
-Invoke-Executable { sudo minikube start --vm-driver=none --kubernetes-version=$KubernetesVersion }
+
+New-Item -ItemType Directory -Path $HOME/.kube, $HOME/.minikube
+New-Item -ItemType File -Path $env:KUBECONFIG
+
+# Start minikube
+Invoke-Executable { sudo minikube start --vm-driver=none --feature-gates=ServerSideApply=true --kubernetes-version=$KubernetesVersion }
+
+Invoke-Executable { sudo chown -R travis: /home/travis/.minikube/ }
 
 # Fix the kubectl context, as it's often stale.
 Invoke-Executable { minikube update-context }
@@ -63,3 +69,5 @@ Wait-KubeConditions -Command { kubectl -n kube-system get pods -lcomponent=kube-
 
 # Wait for kube-dns to be ready.
 Wait-KubeConditions -Command { kubectl -n kube-system get pods -lk8s-app=kube-dns -o json } -Label 'kube-dns'
+
+Invoke-Executable { kubectl version }

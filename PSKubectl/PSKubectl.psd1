@@ -92,6 +92,7 @@
     CmdletsToExport = @(
         'Compare-KubeResource',
         'ConvertFrom-KubeYaml',
+        'ConvertTo-KubeYaml',
         'Get-KubeConfig',
         'Get-KubeDeployment',
         'Get-KubeLog',
@@ -101,7 +102,7 @@
         'Get-KubeResourceKinds',
         'Remove-KubePod',
         'Set-KubeConfig',
-        'Update-KubeResource',
+        'Publish-KubeResource',
         'Use-KubeContext'
     )
 

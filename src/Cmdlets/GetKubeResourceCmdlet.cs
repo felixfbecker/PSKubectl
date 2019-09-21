@@ -6,8 +6,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using KubeClient;
 using KubeClient.Models;
-using KubeClient.ResourceClients;
-using Microsoft.Extensions.Logging;
 
 namespace Kubectl.Cmdlets {
     [Cmdlet(VerbsCommon.Get, "KubeResource")]
@@ -15,7 +13,7 @@ namespace Kubectl.Cmdlets {
     public sealed class GetKubeResourceCmdlet : KubeApiCmdlet {
         [Parameter(ValueFromPipelineByPropertyName = true)]
         [Alias("Ns")]
-        public string Namespace { get; set; }
+        public string Namespace { get; set; } = "default";
 
         [Parameter(Mandatory = true, Position = 0, ValueFromPipelineByPropertyName = true)]
         public string Kind { get; set; }

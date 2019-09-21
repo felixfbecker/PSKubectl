@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Management.Automation;
+using KubeClient.Models;
 using Microsoft.Extensions.Logging;
 using YamlDotNet.Serialization;
 using YamlDotNet.Serialization.NamingConventions;
@@ -11,7 +12,7 @@ namespace Kubectl {
     public class KubeYamlDeserializer {
         private ILogger logger;
         private Dictionary<(string kind, string apiVersion), Type> modelTypes;
-        private Deserializer deserializer;
+        private IDeserializer deserializer;
 
         public KubeYamlDeserializer(ILogger logger, Dictionary<(string kind, string apiVersion), Type> modelTypes) {
             this.logger = logger;
@@ -22,17 +23,20 @@ namespace Kubectl {
                 .Build();
         }
 
+        /// <summary>
+        /// Deserializes the given Kubernetes resource YAML string to PSObjects
+        /// with type names, Dictionaries and Lists depending on the kind of the
+        /// resource and its schema.
+        /// </summary>
         public object Deserialize(string yaml) {
             if (yaml == null) throw new ArgumentNullException(nameof(yaml));
 
             // Deserialize to Dictionary first to check the kind field to determine the type
             Dictionary<string, object> dict = deserializer.Deserialize<Dictionary<string, object>>(yaml);
             string kind = (string)dict["kind"];
-            string apiGroupVersion = (string)dict["apiVersion"];
-            string apiVersion = apiGroupVersion.Split('/').Last();
+            string apiVersion = (string)dict["apiVersion"];
             logger.LogDebug($"apiVersion {apiVersion}");
-            Type type = modelTypes.GetValueOrDefault((kind, apiVersion));
-            if (type == null) {
+            if (!modelTypes.TryGetValue((kind, apiVersion), out Type type)) {
                 throw new Exception($"Unknown (kind: {kind}, apiVersion: {apiVersion}). {modelTypes.Count} Known:\n{String.Join("\n", modelTypes.Keys)}");
             }
             return toPSObject(dict, type);
@@ -65,6 +69,18 @@ namespace Kubectl {
                 // Be tolerant here by trying to cast
                 return Convert.ChangeType(value, type);
             }
+            if (type == typeof(Int32OrStringV1)) {
+                if (value is int) {
+                    return value;
+                }
+                if (value is string stringValue) {
+                    if (Int32.TryParse(stringValue, out int intValue)) {
+                        return intValue;
+                    }
+                    return stringValue;
+                }
+                throw new Exception($"Invalid type: Expected int or string, got {value.GetType().Name}");
+            }
             if (type.IsGenericType) {
                 logger.LogTrace("Is generic");
                 if (type.GetGenericTypeDefinition() == typeof(List<>)) {
@@ -76,8 +92,9 @@ namespace Kubectl {
                     logger.LogTrace("Is map");
                     var valueType = type.GetGenericArguments()[1];
                     // Shadowed type is map too
-                    var dict = new Dictionary<string, object>();
+                    var dict = new Hashtable(); // Use non-generic PowerShell hashmap
                     foreach (DictionaryEntry entry in ((IDictionary)value)) {
+                        // Cast key to string because non-string keys are not valid in Kube YAML
                         dict.Add((string)entry.Key, toPSObject(entry.Value, valueType));
                     }
                     return dict;

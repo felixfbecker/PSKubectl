@@ -239,8 +239,8 @@ namespace Kubectl {
                     } else {
                         logger.LogTrace("List is unordered set");
                         // Lists are to be treated like unordered sets
-                        HashSet<object> originalSet = originalEnumerable.ToHashSet();
-                        HashSet<object> modifiedSet = modifiedEnumerable.ToHashSet();
+                        var originalSet = new HashSet<object>(originalEnumerable);
+                        var modifiedSet = new HashSet<object>(modifiedEnumerable);
                         // The index to adress the element on the server after applying every operation in the patch so far.
                         int index = 0;
                         foreach (var originalElement in originalEnumerable) {
