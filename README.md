@@ -70,22 +70,27 @@ Get-ChildItem *.Deployment.yml -Recurse |
     Publish-KubeResource
 ```
 
+### Serialization
+
 #### `ConvertFrom-KubeYaml`
 
 Takes YAML strings as pipeline input, parses it and returns Kubernetes objects.
 The objects are PSObjects with only the properties from the YAML set (important for diffing purposes), but will have the correct type names set for pretty output formatting.
 Other cmdlets take these objects as input.
 
-#### `Compare-KubeResource`
+#### `ConvertTo-KubeYaml`
 
-Compare two Kubernetes objects and output a JSON Patch.
+Takes the output of `Get-KubeResource`, `ConvertFrom-KubeYaml` or PSCustomObjects and serializes them to valid Kubernetes YAML.
+This can be used to persist a change to a resource back to disk, or to pipe it to native `kubectl`.
 
-Example that replicates the logic of `Publish-KubeResource`:
+Example:
 
 ```powershell
-$modified = Get-Content -Raw deployment.yml | ConvertFrom-KubeYaml
-$original = $modified | Get-KubeDeployment
-Compare-KubeResource -Original $original -Modified $modified -ThreeWayFromLastApplied -Annotate
+Get-Content -Raw some.Deployment.yml |
+    ConvertFrom-KubeYaml |
+    ForEach-Object { $_.Spec.Template.Spec.Containers[0].Image = $newImage; $_ } |
+    ConvertTo-KubeYaml |
+    Out-File some.Deployment.yml
 ```
 
 ### Configuration
