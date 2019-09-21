@@ -15,7 +15,6 @@ $env:CHANGE_MINIKUBE_NONE_USER = 'true'
 Invoke-WebRequest -OutFile kubectl -Uri "https://storage.googleapis.com/kubernetes-release/release/$KubernetesVersion/bin/linux/amd64/kubectl"
 Invoke-Executable { chmod +x kubectl }
 Invoke-Executable { sudo mv kubectl /usr/local/bin/ }
-Invoke-Executable { kubectl version }
 
 # Download minikube.
 Invoke-WebRequest -OutFile minikube -Uri "https://storage.googleapis.com/minikube/releases/$MinikubeVersion/minikube-linux-amd64"
@@ -70,3 +69,5 @@ Wait-KubeConditions -Command { kubectl -n kube-system get pods -lcomponent=kube-
 
 # Wait for kube-dns to be ready.
 Wait-KubeConditions -Command { kubectl -n kube-system get pods -lk8s-app=kube-dns -o json } -Label 'kube-dns'
+
+Invoke-Executable { kubectl version }
