@@ -30,7 +30,7 @@ Invoke-Executable { sudo minikube start --vm-driver=none --feature-gates=ServerS
 Invoke-Executable { sudo chown -R travis: /home/travis/.minikube/ }
 
 # Fix the kubectl context, as it's often stale.
-Invoke-Executable { minikube update-context }
+Invoke-Executable { sudo minikube update-context }
 # Output debug information
 Write-Information "Current context: $(Invoke-Executable { kubectl config current-context })"
 
