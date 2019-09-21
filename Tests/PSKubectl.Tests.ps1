@@ -299,7 +299,7 @@ Describe Get-KubeConfig {
     }
 }
 
-Describe Convert-KubeYaml {
+Describe ConvertFrom-KubeYaml {
     It 'Should read in YAML' {
         $parsed = Get-Content -Raw $PSScriptRoot/test.Deployment.yml | ConvertFrom-KubeYaml
         $parsed.PSObject.TypeNames | Should -Contain 'KubeClient.Models.DeploymentV1'

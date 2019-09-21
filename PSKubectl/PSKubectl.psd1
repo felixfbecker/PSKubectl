@@ -77,7 +77,6 @@
     FormatsToProcess = @(
         'Formats/Config.Format.ps1xml',
         'Formats/DeploymentV1.Format.ps1xml',
-        'Formats/JsonPatch.Operations.Operation.Format.ps1xml',
         'Formats/NamespaceV1.Format.ps1xml',
         'Formats/PodV1.Format.ps1xml'
     )
@@ -90,7 +89,6 @@
 
     # Cmdlets to export from this module, for best performance, do not use wildcards and do not delete the entry, use an empty array if there are no cmdlets to export.
     CmdletsToExport = @(
-        'Compare-KubeResource',
         'ConvertFrom-KubeYaml',
         'ConvertTo-KubeYaml',
         'Get-KubeConfig',
