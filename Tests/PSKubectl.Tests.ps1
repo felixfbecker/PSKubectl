@@ -1,3 +1,7 @@
+# https://github.com/PowerShell/PSScriptAnalyzer/issues/1298
+[Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseConsistentWhitespace', '')]
+param()
+
 Import-Module -Force "$PSScriptRoot/Streams.psm1"
 Import-Module -Force "$PSScriptRoot/Invoke-Executable.psm1"
 Import-Module -Force "$PSScriptRoot/Initialize-TestNamespace.psm1"
