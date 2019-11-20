@@ -13,6 +13,5 @@
             <PrivateAssets>All</PrivateAssets>
         </PackageReference>
         <!-- <PackageReference Include="Serilog.Extensions.Logging.File" Version="1.1.0" /> -->
-        <DotNetCliToolReference Include="MiniCover" Version="3.0.0" />
     </ItemGroup>
 </Project>
