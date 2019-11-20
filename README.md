@@ -70,6 +70,11 @@ Get-ChildItem *.Deployment.yml -Recurse |
     Publish-KubeResource
 ```
 
+#### `Remove-KubeResource`
+
+Removes a Kubernetes resource. Equivalent to `kubectl delete`.
+Accepts pipeline input from `Get-` cmdlets, parsed YAML, `kubectl` JSON and PSCustomObjects.
+
 ### Serialization
 
 #### `ConvertFrom-KubeYaml`
@@ -126,5 +131,5 @@ Run `./build.ps1` to build.
 ### Tests
 
 Tests are written in PowerShell with Pester and run against an actual test Kubernetes cluster, such as Minikube or Docker for Desktop.
-If you want to run them locally, make sure to set your kubectl context to a throw-away cluster, and set `$PSBoundParameterValues['*-Kube*:ApiEndPoint']` to point to that cluster.
+If you want to run them locally, make sure to set your kubectl context to a throw-away cluster.
 Then execute `Invoke-Pester ./Tests` to run the tests.
