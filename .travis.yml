@@ -25,6 +25,7 @@ before_install:
   - sudo apt-get install -y powershell
 
 install:
+  - dotnet tool restore
   - pwsh ./ci/Install-Minikube.ps1 -MinikubeVersion v1.2.0 -KubernetesVersion v1.16.0
   - pwsh -c 'Install-Module -Force -Scope CurrentUser PSScriptAnalyzer'
 
