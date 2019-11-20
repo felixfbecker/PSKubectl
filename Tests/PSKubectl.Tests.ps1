@@ -1,3 +1,7 @@
+# https://github.com/PowerShell/PSScriptAnalyzer/issues/1298
+[Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseConsistentWhitespace', '')]
+param()
+
 Import-Module -Force "$PSScriptRoot/Streams.psm1"
 Import-Module -Force "$PSScriptRoot/Invoke-Executable.psm1"
 Import-Module -Force "$PSScriptRoot/Initialize-TestNamespace.psm1"
@@ -74,6 +78,48 @@ Describe Remove-KubePod {
         if ($pod) {
             $pod.Metadata.DeletionTimestamp | Should -Not -BeNullOrEmpty
         }
+    }
+}
+
+Describe Remove-KubeResource {
+
+    BeforeEach { Initialize-TestNamespace; Initialize-TestDeployment }
+
+    It 'Should delete a pod by name' {
+        $name = (Invoke-Executable { kubectl get pods -n pskubectltest -o json } | ConvertFrom-Json).Items[0].Metadata.Name
+        $name | Should -Not -BeNullOrEmpty
+        Remove-KubeResource -Kind pod -Name $name -Namespace pskubectltest
+        $pod = (Invoke-Executable { kubectl get pods -n pskubectltest -o json $name } | ConvertFrom-Json)
+        if ($pod) {
+            $pod.Metadata.DeletionTimestamp | Should -Not -BeNullOrEmpty
+        }
+    }
+
+    It 'Should delete pods given by wildcard name' {
+        $before = Invoke-Executable { kubectl get pods -n pskubectltest -o name }
+        $before | Should -Not -BeNullOrEmpty
+        Remove-KubeResource -Kind pod -Namespace pskubectltest -Name hello-world-* -ErrorAction Stop
+        (Invoke-Executable { kubectl get pods -n pskubectltest -o json } | ConvertFrom-Json).Items |
+            Where-Object { $_.Metadata.Name -in $before -and $_.Metadata.DeletionTimestamp -eq $null } |
+            Should -BeNullOrEmpty
+    }
+
+    It 'Should delete pods piped from Get-KubePod' {
+        $before = Invoke-Executable { kubectl get pods -n pskubectltest -o name }
+        $before | Should -Not -BeNullOrEmpty
+        Get-KubePod -Namespace pskubectltest | Remove-KubeResource
+        (Invoke-Executable { kubectl get pods -n pskubectltest -o json } | ConvertFrom-Json).Items |
+            Where-Object { $_.Metadata.Name -in $before -and $_.Metadata.DeletionTimestamp -eq $null } |
+            Should -BeNullOrEmpty
+    }
+
+    It 'Should delete pods piped from parsed kubectl JSON' {
+        $before = Invoke-Executable { kubectl get pods -n pskubectltest -o name }
+        $before | Should -Not -BeNullOrEmpty
+        (Invoke-Executable { kubectl get pods -n pskubectltest -o json } | ConvertFrom-Json).Items | Remove-KubeResource
+        (Invoke-Executable { kubectl get pods -n pskubectltest -o json } | ConvertFrom-Json).Items |
+            Where-Object { $_.Metadata.Name -in $before -and $_.Metadata.DeletionTimestamp -eq $null } |
+            Should -BeNullOrEmpty
     }
 }
 

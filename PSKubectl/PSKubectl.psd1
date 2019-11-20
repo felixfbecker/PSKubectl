@@ -59,7 +59,7 @@
     # Script files (.ps1) that are run in the caller's environment prior to importing this module.
     ScriptsToProcess = @(
         'Completers/Get-KubeDeployment.Completer.ps1',
-        'Completers/Get-KubeResource.Completer.ps1',
+        'Completers/Resource.Completer.ps1',
         'Completers/Namespace.Completer.ps1',
         'Completers/PodName.Completer.ps1'
     )
@@ -99,6 +99,7 @@
         'Get-KubeResource',
         'Get-KubeResourceKinds',
         'Remove-KubePod',
+        'Remove-KubeResource',
         'Set-KubeConfig',
         'Publish-KubeResource',
         'Use-KubeContext'
