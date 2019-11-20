@@ -31,7 +31,7 @@ install:
 
 script:
   - ~/.dotnet/tools/dotnet-format
-  - pwsh -c 'Invoke-ScriptAnalyzer -Path . -Recurse -Settings PSScriptAnalyzerSettings.psd1 | Format-List -Property RuleName,Message,ScriptPath,Line,Column'
+  - pwsh -c 'Invoke-ScriptAnalyzer -EnableExit -Path . -Recurse -Settings PSScriptAnalyzerSettings.psd1 | Format-List -Property RuleName,Message,ScriptPath,Line,Column'
   - pwsh ./build.ps1
   - pwsh ./ci/Invoke-Tests.ps1
   - bash <(curl -s https://codecov.io/bash) -f opencovercoverage.xml
