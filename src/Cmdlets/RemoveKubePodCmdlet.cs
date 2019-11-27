@@ -14,30 +14,54 @@ namespace Kubectl.Cmdlets {
     [Cmdlet(VerbsCommon.Remove, "KubePod", SupportsShouldProcess = true, DefaultParameterSetName = "Parameters")]
     [OutputType(new[] { typeof(PodV1) })]
     public sealed class RemoveKubePodCmdlet : KubeApiCmdlet {
+        private const string DefaultParamSet = "DefaultParamSet";
+        private const string NamespaceObjectSet = "NamespaceObjectSet";
+        private const string PodObjectSet = "PodObjectSet";
+
+        [Parameter(ParameterSetName = DefaultParamSet)]
         [Alias("Ns")]
-        [Parameter(ParameterSetName = "Parameters")]
         public string Namespace { get; set; }
 
-        [Parameter(ParameterSetName = "Parameters")]
+        [Parameter(
+            Mandatory = true,
+            Position = 0,
+            ParameterSetName = NamespaceObjectSet,
+            ValueFromPipeline = true)]
+        [ValidateNotNull()]
+        public NamespaceV1 NamespaceObject { get; set; }
+
+        [Parameter(ParameterSetName = DefaultParamSet)]
         public string LabelSelector { get; set; }
 
-        [Parameter(Position = 0, ParameterSetName = "Parameters", ValueFromPipeline = true)]
+        [Parameter(Position = 0, ParameterSetName = DefaultParamSet, ValueFromPipeline = true)]
+        [Parameter(Position = 1, ParameterSetName = NamespaceObjectSet, ValueFromPipelineByPropertyName = true)]
         [SupportsWildcards()]
         public string Name { get; set; }
 
-        [Parameter(Mandatory = true, ValueFromPipeline = true, ParameterSetName = "Object")]
+        [Parameter(Mandatory = true, Position = 0, ValueFromPipeline = true, ParameterSetName = PodObjectSet)]
+        [Alias("Pod")]
         [ValidateNotNull()]
-        public object Pod { get; set; }
+        public object PodObject { get; set; }
 
         protected override async Task ProcessRecordAsync(CancellationToken cancellationToken) {
             await base.ProcessRecordAsync(cancellationToken);
-            if (ParameterSetName == "Parameters") {
+            if (ParameterSetName == PodObjectSet) {
+                await DeletePod(
+                    name: (string) PodObject.GetDynamicPropertyValue("Metadata").GetDynamicPropertyValue("Name"),
+                    kubeNamespace: (string) PodObject.GetDynamicPropertyValue("Metadata")
+                        .GetDynamicPropertyValue("Namespace"),
+                    cancellationToken: cancellationToken
+                );
+            } else {
+                var _namespace = NamespaceObject?.Metadata.Name ?? Namespace;
+
                 if (Name != null) {
                     Name = Regex.Replace(Name, "^pods?/", "", RegexOptions.IgnoreCase);
                 }
+
                 if (LabelSelector != null || WildcardPattern.ContainsWildcardCharacters(Name)) {
                     IEnumerable<PodV1> podList = await client.PodsV1().List(
-                        kubeNamespace: Namespace,
+                        kubeNamespace: _namespace,
                         labelSelector: LabelSelector,
                         cancellationToken: cancellationToken
                     );
@@ -45,20 +69,16 @@ namespace Kubectl.Cmdlets {
                         var pattern = new WildcardPattern(Name);
                         podList = podList.Where(pod => pattern.IsMatch(pod.Metadata.Name));
                     }
-                    await Task.WhenAll(podList.Select(pod => deletePod(pod.Metadata.Name, pod.Metadata.Namespace, cancellationToken)));
+
+                    await Task.WhenAll(podList.Select(pod =>
+                        DeletePod(pod.Metadata.Name, pod.Metadata.Namespace, cancellationToken)));
                 } else {
-                    await deletePod(name: Name, kubeNamespace: Namespace, cancellationToken: cancellationToken);
+                    await DeletePod(name: Name, kubeNamespace: _namespace, cancellationToken: cancellationToken);
                 }
-            } else {
-                await deletePod(
-                    name: (string)Pod.GetDynamicPropertyValue("Metadata").GetDynamicPropertyValue("Name"),
-                    kubeNamespace: (string)Pod.GetDynamicPropertyValue("Metadata").GetDynamicPropertyValue("Namespace"),
-                    cancellationToken: cancellationToken
-                );
             }
         }
 
-        private async Task deletePod(string name, string kubeNamespace, CancellationToken cancellationToken) {
+        private async Task DeletePod(string name, string kubeNamespace, CancellationToken cancellationToken) {
             if (!ShouldProcess($"Deleting pod \"{name}\" in namespace \"{kubeNamespace}\"", $"Delete pod \"{name}\" in namespace \"{kubeNamespace}\"?", "Confirm")) {
                 return;
             }

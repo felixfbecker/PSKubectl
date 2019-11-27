@@ -14,11 +14,31 @@ namespace Kubectl.Cmdlets {
     [Cmdlet(VerbsCommon.Get, "KubeLog")]
     [OutputType(new[] { typeof(string) })]
     public class GetKubeLogCmdlet : KubeApiCmdlet {
+        private const string DefaultParamSet = "DefaultParamSet";
+        private const string NamespaceObjectSet = "NamespaceObjectSet";
+
         [Parameter(ValueFromPipelineByPropertyName = true)]
         [Alias("Ns")]
         public string Namespace { get; set; }
 
-        [Parameter(Position = 0, Mandatory = true, ValueFromPipeline = true, ValueFromPipelineByPropertyName = true)]
+        [Parameter(
+            Mandatory = true,
+            Position = 0,
+            ParameterSetName = NamespaceObjectSet,
+            ValueFromPipeline = true)]
+        [ValidateNotNull()]
+        public NamespaceV1 NamespaceObject { get; set; }
+
+        [Parameter(
+            Mandatory = true,
+            Position = 0,
+            ParameterSetName = DefaultParamSet,
+            ValueFromPipeline = true, ValueFromPipelineByPropertyName = true)]
+        [Parameter(
+            Mandatory = true,
+            Position = 1,
+            ParameterSetName = NamespaceObjectSet,
+            ValueFromPipelineByPropertyName = true)]
         public string Name { get; set; }
 
         [Parameter(Position = 1)]
@@ -35,9 +55,12 @@ namespace Kubectl.Cmdlets {
 
         protected override async Task ProcessRecordAsync(CancellationToken cancellationToken) {
             base.BeginProcessing();
+
+            var _namespace = NamespaceObject?.Metadata.Name ?? Namespace;
+
             if (Follow) {
                 IObservable<string> logs = client.PodsV1().StreamLogs(
-                    kubeNamespace: Namespace,
+                    kubeNamespace: _namespace,
                     name: Name,
                     containerName: Container,
                     limitBytes: LimitBytes,
@@ -46,7 +69,7 @@ namespace Kubectl.Cmdlets {
                 await logs.ObserveOn(SynchronizationContext.Current).ForEachAsync(WriteObject, cancellationToken);
             } else {
                 string logs = await client.PodsV1().Logs(
-                    kubeNamespace: Namespace,
+                    kubeNamespace: _namespace,
                     name: Name,
                     containerName: Container,
                     limitBytes: LimitBytes,

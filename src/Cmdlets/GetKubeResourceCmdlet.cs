@@ -11,22 +11,52 @@ namespace Kubectl.Cmdlets {
     [Cmdlet(VerbsCommon.Get, "KubeResource")]
     [OutputType(new[] { typeof(KubeResourceV1) })]
     public sealed class GetKubeResourceCmdlet : KubeApiCmdlet {
+        private const string DefaultParamSet = "DefaultParamSet";
+        private const string NamespaceObjectSet = "NamespaceObjectSet";
+
         [Parameter(ValueFromPipelineByPropertyName = true)]
         [Alias("Ns")]
         public string Namespace { get; set; } = "default";
 
-        [Parameter(Mandatory = true, Position = 0, ValueFromPipelineByPropertyName = true)]
+        [Parameter(
+            Mandatory = true,
+            Position = 0,
+            ParameterSetName = NamespaceObjectSet,
+            ValueFromPipeline = true)]
+        [ValidateNotNull()]
+        public NamespaceV1 NamespaceObject { get; set; }
+
+        [Parameter(
+            Mandatory = true,
+            Position = 0,
+            ParameterSetName = DefaultParamSet,
+            ValueFromPipelineByPropertyName = true)]
+        [Parameter(
+            Mandatory = true,
+            Position = 1,
+            ParameterSetName = NamespaceObjectSet,
+            ValueFromPipelineByPropertyName = true)]
         public string Kind { get; set; }
 
         [Parameter(ValueFromPipelineByPropertyName = true)]
         public string ApiVersion { get; set; }
 
-        [Parameter(Position = 1, ValueFromPipeline = true, ValueFromPipelineByPropertyName = true)]
+        [Parameter(
+            Position = 1,
+            ParameterSetName = DefaultParamSet,
+            ValueFromPipeline = true, ValueFromPipelineByPropertyName = true)]
+        [Parameter(
+            Position = 2,
+            ParameterSetName = NamespaceObjectSet,
+            ValueFromPipelineByPropertyName = true)]
         [SupportsWildcards()]
         public string Name { get; set; }
 
         protected override async Task ProcessRecordAsync(CancellationToken cancellationToken) {
             await base.ProcessRecordAsync(cancellationToken);
+
+            var _namespace = NamespaceObject?.Metadata.Name ?? Namespace;
+
             IEnumerable<KubeResourceV1> resources;
             var getList = String.IsNullOrEmpty(Name) || WildcardPattern.ContainsWildcardCharacters(Name);
             var typeLookup = getList ? ListModelTypes : ModelTypes;
@@ -46,7 +76,7 @@ namespace Kubectl.Cmdlets {
                 var resourceList = await client.Dynamic().List(
                     kind: Kind,
                     apiVersion: ApiVersion,
-                    kubeNamespace: Namespace,
+                    kubeNamespace: _namespace,
                     cancellationToken: cancellationToken
                 );
                 resources = resourceList.EnumerateItems();
@@ -55,7 +85,7 @@ namespace Kubectl.Cmdlets {
                     kind: Kind,
                     apiVersion: ApiVersion,
                     name: Name,
-                    kubeNamespace: Namespace,
+                    kubeNamespace: _namespace,
                     cancellationToken: cancellationToken
                 );
                 resources = new[] { resource };

@@ -11,9 +11,8 @@ using Microsoft.Extensions.Logging;
 
 namespace Kubectl.Cmdlets {
     [Cmdlet(VerbsCommon.Get, "KubeNamespace")]
-    [OutputType(new[] { typeof(PodV1) })]
+    [OutputType(new[] { typeof(NamespaceV1) })]
     public sealed class GetKubeNamespaceCmdlet : KubeApiCmdlet {
-
         [Parameter()]
         public string LabelSelector { get; set; }
 
