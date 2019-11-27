@@ -19,7 +19,7 @@ namespace Kubectl.Cmdlets {
         private const string ResourceObjectSet = "ResourceObjectSet";
 
         [Alias("Ns")]
-        [Parameter(ParameterSetName = "Parameters")]
+        [Parameter(ParameterSetName = DefaultParamSet)]
         public string Namespace { get; set; }
 
         [Parameter(
