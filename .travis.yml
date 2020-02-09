@@ -1,5 +1,5 @@
 language: csharp
-dotnet: '2.2.401'
+dotnet: '3.0.100'
 mono: none
 
 sudo: required
@@ -25,12 +25,12 @@ before_install:
   - sudo apt-get install -y powershell
 
 install:
-  - dotnet tool install -g dotnet-format --version 3.1.37601
+  - dotnet tool restore
   - pwsh ./ci/Install-Minikube.ps1 -MinikubeVersion v1.2.0 -KubernetesVersion v1.16.0
   - pwsh -c 'Install-Module -Force -Scope CurrentUser PSScriptAnalyzer'
 
 script:
-  - ~/.dotnet/tools/dotnet-format
+  - dotnet dotnet-format
   - pwsh -c 'Invoke-ScriptAnalyzer -EnableExit -Path . -Recurse -Settings PSScriptAnalyzerSettings.psd1 | Format-List -Property RuleName,Message,ScriptPath,Line,Column'
   - pwsh ./build.ps1
   - pwsh ./ci/Invoke-Tests.ps1

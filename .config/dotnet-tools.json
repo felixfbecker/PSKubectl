@@ -1,0 +1,18 @@
+{
+  "version": 1,
+  "isRoot": true,
+  "tools": {
+    "dotnet-format": {
+      "version": "4.0.40103",
+      "commands": [
+        "dotnet-format"
+      ]
+    },
+    "minicover": {
+      "version": "3.0.0",
+      "commands": [
+        "minicover"
+      ]
+    }
+  }
+}
