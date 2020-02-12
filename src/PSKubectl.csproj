@@ -6,8 +6,8 @@
     <ItemGroup>
         <!-- <ProjectReference Include="../../dotnet-kube-client/src/KubeClient/KubeClient.csproj" /> -->
         <!-- <ProjectReference Include="../../dotnet-kube-client/src/KubeClient.Extensions.KubeConfig/KubeClient.Extensions.KubeConfig.csproj" /> -->
-        <PackageReference Include="KubeClient" Version="2.3.9" />
-        <PackageReference Include="KubeClient.Extensions.KubeConfig" Version="2.3.9" />
+        <PackageReference Include="KubeClient" Version="2.3.11" />
+        <PackageReference Include="KubeClient.Extensions.KubeConfig" Version="2.3.11" />
         <PackageReference Include="System.Management.Automation" Version="6.1.1">
             <!-- Inclue all private assets to prevent 'dotnet publish' from publishing all the unneeded DLLs that PowerShell ships with already -->
             <PrivateAssets>All</PrivateAssets>
