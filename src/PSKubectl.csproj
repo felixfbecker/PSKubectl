@@ -12,7 +12,7 @@
             <!-- Inclue all private assets to prevent 'dotnet publish' from publishing all the unneeded DLLs that PowerShell ships with already -->
             <PrivateAssets>All</PrivateAssets>
         </PackageReference>
-        <!-- <PackageReference Include="Serilog.Extensions.Logging.File" Version="1.1.0" /> -->
+        <!-- <PackageReference Include="Serilog.Extensions.Logging.File" Version="2.0.0" /> -->
         <DotNetCliToolReference Include="MiniCover" Version="2.0.0-ci-20180315091931" />
     </ItemGroup>
 </Project>
