@@ -1,7 +1,7 @@
 {
   "private": true,
   "devDependencies": {
-    "@semantic-release/exec": "^5.0.0",
+    "@semantic-release/exec": "^6.0.0",
     "semantic-release": "^17.0.0"
   }
 }
